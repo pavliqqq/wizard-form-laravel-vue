@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Member;
+namespace App\Http\Requests\Form;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateRequest extends FormRequest
+class SecondStepRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,9 +22,10 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'full_name' => 'required|string',
-            'report_subject' => 'required|string',
-            'email'=> 'required|string'
+            'id' => 'required | string',
+            'company' => 'nullable | string | min: 2 | max: 100',
+            'position' => 'nullable | string | min: 2 | max: 100',
+            'about_me' => 'nullable | min: 2 | max: 1000',
         ];
     }
 }
