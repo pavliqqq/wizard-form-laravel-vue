@@ -29,16 +29,28 @@
         </div>
 
         <div class="flex flex-col">
-            <!--            <select id="countrySelect" name="country" class="border p-2 rounded w-full">-->
-            <!--                <option value="" disabled selected>Select country</option>-->
-            <!--            </select>-->
-            <input name="country" type="text" placeholder="Country(2)" v-model="country"
-                   class="border p-2 rounded w-full"/>
-            <div class="error-message text-red-600 text-sm mt-1"></div>
+            <select name="country" v-model="country" class="border p-2 rounded w-full"
+                    @changeCountry="changeCountry = event">
+                <option value="" disabled>Select country</option>
+                <option v-for="country in countries" :key="country.iso2" :value="country.iso2">
+                    {{ country.name }} (+{{ country.dialCode }})
+                </option>
+            </select>
         </div>
 
         <div class="flex flex-col">
-            <input id="phone" name="phone" type="tel" v-model="phone" class="border p-2 rounded w-full"/>
+            <IntlTelInput
+                ref="phoneInput"
+                v-model="phone"
+                :options="{
+                  initialCountry: 'us',
+                  autoPlaceholder: 'polite',
+                  allowDropdown: false,
+                  nationalMode: false,
+                  formatOnDisplay: true,
+                }"
+                class="w-full border p-2 rounded"
+            />
             <div class="error-message text-red-600 text-sm mt-1"></div>
         </div>
 
@@ -57,9 +69,16 @@
 </template>
 
 <script>
-import router from '../../router.js'
+import IntlTelInput from "intl-tel-input/vueWithUtils";
+import intlTelInput from "intl-tel-input";
+
 export default {
     name: "FirstStep",
+    components: {
+        IntlTelInput,
+    },
+
+    inject: ['showErrors'],
 
     data() {
         return {
@@ -67,27 +86,40 @@ export default {
             last_name: null,
             birthdate: null,
             report_subject: null,
-            country: null,
+            country: "us",
             phone: null,
-            email: null
-        }
+            email: null,
+            countries: [],
+        };
     },
-
+    mounted() {
+        this.countries = intlTelInput.getCountryData();
+    },
     methods: {
-        addMember() {
-            axios.post('/api/members', {
-                first_name: this.first_name,
-                last_name: this.last_name,
-                birthdate: this.birthdate,
-                report_subject: this.report_subject,
-                country: this.country,
-                phone: this.phone,
-                email: this.email
-            })
-                .then(res => {
-                    router.push({ name: 'second.step' })
-                })
-        }
-    }
-}
+       async addMember() {
+            try {
+                const res = await axios.post("/api/members", {
+                    first_name: this.first_name,
+                    last_name: this.last_name,
+                    birthdate: this.birthdate,
+                    report_subject: this.report_subject,
+                    country: this.country,
+                    phone: this.phone,
+                    email: this.email,
+                });
+
+                localStorage.setItem('id', res.data.id);
+                this.$router.push({ name: "second.step" });
+            } catch (error) {
+                if (error.response.status === 422) {
+                    this.showErrors(error.response.data.errors);
+                }
+            }
+        },
+    },
+};
 </script>
+
+<style>
+@import "intl-tel-input/build/css/intlTelInput.css";
+</style>
