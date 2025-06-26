@@ -9,8 +9,8 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::post('/members', [FormController::class, 'firstStep']);
+Route::post('/members/first', [FormController::class, 'firstStep']);
 Route::get('/members', [FormController::class, 'getAllMembers']);
-Route::patch('/members/{member}', [FormController::class, 'secondStep']);
+Route::post('/members/second', [FormController::class, 'secondStep']);
 Route::delete('/members/{member}', [FormController::class, 'delete']);
 
