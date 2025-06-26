@@ -96,9 +96,9 @@ export default {
         this.countries = intlTelInput.getCountryData();
     },
     methods: {
-       async addMember() {
+        async addMember() {
             try {
-                const res = await axios.post("/api/members", {
+                const res = await axios.post("/api/members/first", {
                     first_name: this.first_name,
                     last_name: this.last_name,
                     birthdate: this.birthdate,
@@ -109,7 +109,7 @@ export default {
                 });
 
                 localStorage.setItem('id', res.data.id);
-                this.$router.push({ name: "second.step" });
+                this.$router.push({name: "second.step"});
             } catch (error) {
                 if (error.response.status === 422) {
                     this.showErrors(error.response.data.errors);
