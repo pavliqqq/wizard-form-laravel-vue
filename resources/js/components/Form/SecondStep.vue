@@ -23,7 +23,7 @@
             </div>
 
             <div class="flex flex-col">
-                <input name="photo" type="file" class="border p-2 rounded w-full"/>
+                <input name="photo" type="file" @change="onFileChange" class="border p-2 rounded w-full"/>
                 <div class="error-message text-red-600 text-sm mt-1"></div>
             </div>
         </div>
@@ -61,19 +61,33 @@ export default {
 
     methods: {
 
+        onFileChange(event) {
+            const file = event.target.files[0];
+            this.photo = file || null;
+        },
+
         goToFirstStep() {
             this.$router.push({name: 'first.step'});
         },
 
         async secondStepSubmit() {
             this.id = localStorage.getItem('id');
+
+            const formData = new FormData();
+
+            formData.append('id', this.id);
+            formData.append('company', this.company);
+            formData.append('position', this.position);
+            formData.append('about_me', this.about_me);
+
+            if (this.photo instanceof File) {
+                formData.append('photo', this.photo);
+            }
             try {
-                const res = await axios.patch(`/api/members/${this.id}`, {
-                    id: this.id,
-                    company: this.company,
-                    position: this.position,
-                    about_me: this.about_me,
-                    photo: this.photo,
+                const res = await axios.post('/api/members/second', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
                 });
 
                 localStorage.setItem('count', res.data.count);

@@ -22,10 +22,11 @@ class SecondStepRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required | string',
+            'id' => 'required',
             'company' => 'nullable | string | min: 2 | max: 100',
             'position' => 'nullable | string | min: 2 | max: 100',
             'about_me' => 'nullable | min: 2 | max: 1000',
+            'photos' => 'nullable | image | mimes:jpg,jpeg,png,gif | max:512'
         ];
     }
 }
