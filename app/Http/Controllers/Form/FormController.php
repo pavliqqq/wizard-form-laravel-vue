@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Form;
 use App\Http\Requests\Form\FirstStepRequest;
 use App\Http\Requests\Form\SecondStepRequest;
 use App\Models\Member;
+use App\Services\FileService;
 
 class FormController
 {
@@ -28,13 +29,19 @@ class FormController
 
     public function getAllMembers()
     {
-        $members = Member::all();
+        $members = Member::select('id', 'photo', 'first_name', 'last_name', 'report_subject', 'email')->get();
+        $result = [];
 
         foreach ($members as $member) {
-            $member['full_name'] = $member['first_name'] . ' ' . $member['last_name'];
+            $result[] = [
+                'photo' => $member['photo'],
+                'full_name' => $member['first_name'] . ' ' . $member['last_name'],
+                'report_subject' => $member['report_subject'],
+                'email' => $member['email'],
+            ];
         }
 
-        return $members;
+        return response()->json(['members' => $result]);
     }
 
     public function secondStep(SecondStepRequest $request)
@@ -43,11 +50,14 @@ class FormController
 
         $id = (int)$data['id'] ?? 0;
 
-        $member =  Member::find($id);
+        $member = Member::find($id);
 
         if (!$member) {
             return response()->json(['success' => false, 'error' => 'Invalid member ID']);
         }
+
+        $photoPath = FileService::photoService($request, $member);
+        $data['photo'] = $photoPath;
 
         $member->update($data);
         $count = Member::count();
