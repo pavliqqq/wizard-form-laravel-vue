@@ -18,8 +18,7 @@
                 <tr :class="isEdit(member.id) ? 'hidden' : 'border-b'">
                     <th class="hidden">{{ member.id }}</th>
                     <td class="p-3">
-                        <!--                    <img src="{{ member['photo'] }}" alt="{{ member['full_name'] }}"-->
-                        <!--                         class="h-12 w-12 object-cover rounded-full">-->
+                        <img :src="`/storage/${member.photo}`" :alt="member.full_name" class="h-12 w-12 object-cover rounded-full" />
                     </td>
                     <td class="p-3 break-words">{{ member.full_name }}</td>
                     <td class="p-3 break-words">{{ member.report_subject }}</td>
@@ -84,7 +83,7 @@ export default {
     methods: {
         getMembers() {
             axios.get('api/members').then(res => {
-                this.members = res.data;
+                this.members = res.data.members;
             })
         },
 
