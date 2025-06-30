@@ -1,16 +1,29 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Form\FormController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::prefix('members')->group(function (){
+    Route::post('/first', [FormController::class, 'firstStep']);
+    Route::get('/all', [FormController::class, 'getAllMembers']);
+    Route::post('/second', [FormController::class, 'secondStep']);
+    Route::get('/third', [FormController::class, 'thirdStep']);
+});
 
-Route::post('/members/first', [FormController::class, 'firstStep']);
-Route::get('/members', [FormController::class, 'getAllMembers']);
-Route::post('/members/second', [FormController::class, 'secondStep']);
-Route::delete('/members/{member}', [FormController::class, 'delete']);
+Route::prefix('admin')->group(function (){
+    Route::post('/login', [AuthController::class, 'login']);
+
+    Route::middleware('auth:sanctum')->group(function(){
+        Route::post('/logout', [AuthController::class, 'logout']);
+
+        Route::prefix('members')->group(function () {
+            Route::post('/{member}', [AdminController::class, 'update']);
+            Route::post('/toggle/{member}', [AdminController::class, 'toggleVisibility']);
+            Route::delete('/{member}', [AdminController::class, 'delete']);
+        });
+    });
+});
 
