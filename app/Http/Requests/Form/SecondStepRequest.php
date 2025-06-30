@@ -26,7 +26,7 @@ class SecondStepRequest extends FormRequest
             'company' => 'nullable | string | min: 2 | max: 100',
             'position' => 'nullable | string | min: 2 | max: 100',
             'about_me' => 'nullable | min: 2 | max: 1000',
-            'photos' => 'nullable | image | mimes:jpg,jpeg,png,gif | max:512'
+            'photo' => 'nullable | image | mimes:jpg,jpeg,png,gif | max:512'
         ];
     }
 }
