@@ -6,18 +6,9 @@
 </template>
 
 
-<script>
+<script setup>
 import FormComponent from './FormComponent.vue';
 import Map from "./Map.vue";
-
-export default {
-    name: 'App',
-
-    components: {
-        Map,
-        FormComponent
-    },
-}
 </script>
 
 
