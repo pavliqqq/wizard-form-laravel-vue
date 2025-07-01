@@ -61,6 +61,7 @@
             <PhoneInput
                 v-model:phone="formData.phone"
                 v-model:country="formData.country"
+                v-model:phoneValid="formData.phone_valid"
                 :key="renderKey"
                 :errors="errors"
             />
@@ -107,6 +108,7 @@ const formData = ref({
     report_subject: '',
     country: 'US',
     phone: '',
+    phone_valid: false,
     email: ''
 });
 
