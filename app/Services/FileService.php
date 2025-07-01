@@ -13,7 +13,7 @@ class FileService
     public static function photoService(FormRequest $request, Member $member): string
     {
         if ($request->hasFile('photo')) {
-            if(!empty($member->photo)){
+            if (!empty($member->photo) && $member->photo !== self::DEFAULT_PHOTO) {
                 Storage::disk('public')->delete($member->photo);
             }
 
