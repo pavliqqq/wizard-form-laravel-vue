@@ -36,7 +36,6 @@
                     name="birthdate"
                     type="date"
                     v-model="formData.birthdate"
-                    id="birthdate"
                     :max=birthdate
                     class="border p-2 rounded w-full outline-none focus-within:border-gray-800 focus:border-gray-800"
                 />
@@ -92,7 +91,7 @@
 
 <script setup>
 
-import PhoneInput from "../CountryPhoneInput.vue"
+import PhoneInput from "../CountryPhoneInput/CountryPhoneInput.vue"
 import {ref, inject, onMounted} from 'vue'
 import router from "../../router.js";
 
@@ -106,7 +105,7 @@ const formData = ref({
     last_name: '',
     birthdate: '',
     report_subject: '',
-    country: 'US',
+    country: '',
     phone: '',
     phone_valid: false,
     email: ''
@@ -148,6 +147,3 @@ async function addMember() {
     }
 }
 </script>
-
-<style>
-</style>

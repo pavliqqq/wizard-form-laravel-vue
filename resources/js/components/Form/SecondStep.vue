@@ -58,7 +58,7 @@
 
         <div class="flex justify-between pt-2">
             <button
-                @click="goToFirstStep()"
+                @click="goToFirstStep"
                 class="bg-gray-300 hover:bg-gray-400 text-black px-6 py-2 rounded transition-colors duration-200">
                 Back
             </button>
@@ -80,9 +80,7 @@ import router from "../../router.js";
 const showErrors = inject('showErrors');
 const clearErrors = inject('clearErrors');
 
-const props = defineProps({
-    errors: Object
-});
+const {errors} = defineProps({errors: Object})
 
 const Data = ref({
     id: '',
@@ -145,7 +143,7 @@ async function secondStepSubmit() {
         localStorage.setItem('count', res.data.count);
         await router.push({name: 'third.step'});
     } catch (error) {
-        if (error.response?.status === 422) {
+        if (error.response && error.response.status === 422) {
             showErrors(error.response.data.errors);
         }
     }

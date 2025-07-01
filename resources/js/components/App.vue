@@ -8,8 +8,3 @@
 <script setup>
 import FormComponent from './FormComponent.vue';
 </script>
-
-
-<style scoped>
-
-</style>

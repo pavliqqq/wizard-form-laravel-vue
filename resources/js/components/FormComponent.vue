@@ -7,8 +7,8 @@
 
 <script setup>
 import {reactive, provide, ref, computed} from 'vue'
-import Logout from "./Logout.vue";
-import Map from "./Map.vue";
+import Logout from "./Admin/Logout.vue";
+import Map from "./Map/Map.vue";
 import {useRoute} from "vue-router";
 
 const errors = reactive({})

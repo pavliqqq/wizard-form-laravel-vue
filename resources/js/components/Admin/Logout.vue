@@ -25,7 +25,3 @@ async function logout() {
     window.location.reload()
 }
 </script>
-
-<style scoped>
-
-</style>

@@ -47,7 +47,7 @@ const twitterUrl = ref(null)
 
 onMounted(() => {
     getFbTwUrl();
-    count.value = localStorage.getItem('count') || 0
+    count.value = localStorage.getItem('count')
 })
 
 function startOver() {

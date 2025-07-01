@@ -71,8 +71,3 @@ const phoneOptions = {
     },
 }
 </script>
-
-
-<style scoped>
-
-</style>

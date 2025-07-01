@@ -42,7 +42,7 @@
 <script setup>
 
 import {inject, ref} from "vue";
-import router from "../router.js";
+import router from "../../router.js";
 
 const showErrors = inject('showErrors')
 const isAdmin = inject('isAdmin')
@@ -71,8 +71,3 @@ async function login() {
 }
 
 </script>
-
-
-<style scoped>
-
-</style>
