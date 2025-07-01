@@ -18,11 +18,11 @@ const routes = [
         name: 'third.step'
     },
     {
-        path: '/all_members', component: () => import('./components/AllMembers.vue'),
+        path: '/all_members', component: () => import('./components/AllMembers/AllMembers.vue'),
         name: 'all.members'
     },
     {
-        path: '/admin/login', component: () => import('./components/AdminLogin.vue'),
+        path: '/admin/login', component: () => import('./components/Admin/AdminLogin.vue'),
         name: 'admin.login'
     },
 ]

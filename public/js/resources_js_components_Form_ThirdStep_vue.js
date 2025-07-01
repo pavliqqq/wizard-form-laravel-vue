@@ -29,7 +29,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     var twitterUrl = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)(null);
     (0,vue__WEBPACK_IMPORTED_MODULE_0__.onMounted)(function () {
       getFbTwUrl();
-      count.value = localStorage.getItem('count') || 0;
+      count.value = localStorage.getItem('count');
     });
     function startOver() {
       ['firstStep', 'secondStep', 'count', 'id'].forEach(function (k) {

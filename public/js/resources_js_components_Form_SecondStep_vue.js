@@ -29,7 +29,6 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     __expose();
     var showErrors = (0,vue__WEBPACK_IMPORTED_MODULE_0__.inject)('showErrors');
     var clearErrors = (0,vue__WEBPACK_IMPORTED_MODULE_0__.inject)('clearErrors');
-    var props = __props;
     var Data = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)({
       id: '',
       company: '',
@@ -69,7 +68,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     }
     function _secondStepSubmit() {
       _secondStepSubmit = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
-        var sendFormData, res, _error$response, _t;
+        var sendFormData, res, _t;
         return _regenerator().w(function (_context) {
           while (1) switch (_context.n) {
             case 0:
@@ -103,7 +102,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             case 4:
               _context.p = 4;
               _t = _context.v;
-              if (((_error$response = _t.response) === null || _error$response === void 0 ? void 0 : _error$response.status) === 422) {
+              if (_t.response && _t.response.status === 422) {
                 showErrors(_t.response.data.errors);
               }
             case 5:
@@ -116,7 +115,6 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     var __returned__ = {
       showErrors: showErrors,
       clearErrors: clearErrors,
-      props: props,
       Data: Data,
       fileChange: fileChange,
       goToFirstStep: goToFirstStep,
@@ -188,7 +186,7 @@ var _hoisted_11 = {
   "class": "flex justify-between pt-2"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [_cache[4] || (_cache[4] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h2", {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [_cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h2", {
     "class": "text-xl text-center font-semibold mb-6",
     id: "form_title"
   }, "To participate in the conference, please fill out the form", -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -221,9 +219,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onChange: $setup.fileChange,
     "class": "border p-2 rounded w-full focus-within:border-gray-800 focus:border-gray-800"
   }, null, 32 /* NEED_HYDRATION */), $props.errors.photo ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.errors.photo), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    onClick: _cache[3] || (_cache[3] = function ($event) {
-      return $setup.goToFirstStep();
-    }),
+    onClick: $setup.goToFirstStep,
     "class": "bg-gray-300 hover:bg-gray-400 text-black px-6 py-2 rounded transition-colors duration-200"
   }, " Back "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($setup.secondStepSubmit, ["prevent"]),
