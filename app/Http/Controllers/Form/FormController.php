@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Form;
 use App\Http\Requests\Form\FirstStepRequest;
 use App\Http\Requests\Form\SecondStepRequest;
 use App\Models\Member;
+use App\Services\AuthService;
 use App\Services\FileService;
 use Illuminate\Http\Request;
 
@@ -14,6 +15,7 @@ class FormController
     public function firstStep(FirstStepRequest $request)
     {
         $data = $request->validated();
+        unset($data['phone_valid']);
 
         $member = Member::where('email', $data['email'])->first();
 
@@ -28,21 +30,33 @@ class FormController
         return response()->json(['success' => true, 'id' => $id]);
     }
 
-    public function getAllMembers()
+    public function getAllMembers(Request $request)
     {
+        $isAdmin = AuthService::isAdmin($request);
 
-        $members = Member::select('id', 'photo', 'first_name', 'last_name', 'report_subject', 'email', 'visibility')->get();
+        if ($isAdmin) {
+            $members = Member::select('id', 'photo', 'first_name', 'last_name', 'report_subject', 'email', 'visibility')->get();
+        } else {
+            $members = Member::where('visibility', true)
+                ->select('id', 'photo', 'first_name', 'last_name', 'report_subject', 'email')->get();
+        }
+
         $result = [];
 
         foreach ($members as $member) {
-            $result[] = [
+            $item = [
                 'id' => $member['id'],
                 'photo' => $member['photo'],
                 'full_name' => $member['first_name'] . ' ' . $member['last_name'],
                 'report_subject' => $member['report_subject'],
                 'email' => $member['email'],
-                'visibility' => $member['visibility']
             ];
+
+            if ($isAdmin) {
+                $item['visibility'] = $member['visibility'];
+            }
+
+            $result[] = $item;
         }
 
         return response()->json(['members' => $result]);
