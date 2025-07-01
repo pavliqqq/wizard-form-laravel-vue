@@ -30,17 +30,27 @@
                             {{ member.email }}
                         </a>
                     </td>
-                    <td v-if="isAdmin">
-                        <a href="#" @click.prevent="changeMemberId(member)">Edit</a>
+                    <td v-if="isAdmin" class="p-3">
+                        <button
+                            @click.prevent="changeMemberId(member)"
+                            class="underline text-orange-600"
+                        >
+                            Edit
+                        </button>
                     </td>
-                    <td v-if="isAdmin">
-                        <a href="#" @click.prevent="deleteMember(member.id)">Delete</a>
+                    <td v-if="isAdmin" class="p-3">
+                        <button
+                            @click.prevent="deleteMember(member.id)"
+                            class="underline text-red-600"
+                        >
+                            Delete
+                        </button>
                     </td>
-                    <td v-if="isAdmin">
+                    <td v-if="isAdmin" class="p-3">
                         <button
                             @click.prevent="toggleVisibility(member)"
                             :class="member.visibility ? 'text-green-600' : 'text-gray-400'"
-                            class="underline text-sm"
+                            class="underline"
                             :title="member.visibility ? 'Visible' : 'Hidden'"
                         >
                             {{ member.visibility ? 'Visible' : 'Hidden' }}
@@ -180,11 +190,19 @@ function fileChange(event) {
 
 async function getMembers() {
     try {
-        const res = await axios.get('/api/members/all')
-
+        let res;
+        if (props.isAdmin) {
+            res = await axios.get('/api/members/all', {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                }
+            });
+        } else {
+            res = await axios.get('/api/members/all');
+        }
         members.value = res.data.members;
     } catch (e) {
-        console.error('Failed to load members', e)
+        console.error('Failed to load members', e);
     }
 }
 
