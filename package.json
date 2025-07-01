@@ -13,6 +13,7 @@
     },
     "devDependencies": {
         "@popperjs/core": "^2.11.6",
+        "@types/vue-tel-input": "^2.1.7",
         "axios": "^1.8.2",
         "bootstrap": "^5.2.3",
         "concurrently": "^9.0.1",
@@ -23,6 +24,9 @@
         "vue-loader": "^16.8.3"
     },
     "dependencies": {
-        "vue-router": "^4.5.1"
+        "inputmask": "^5.0.9",
+        "leaflet": "^1.9.4",
+        "vue-router": "^4.5.1",
+        "vue-tel-input": "^9.3.0"
     }
 }
