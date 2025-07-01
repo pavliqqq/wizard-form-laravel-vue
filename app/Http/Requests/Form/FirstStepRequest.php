@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Form;
 
+use App\Rules\CountryCheck;
 use Illuminate\Foundation\Http\FormRequest;
 
 class FirstStepRequest extends FormRequest
@@ -23,8 +24,9 @@ class FirstStepRequest extends FormRequest
             'last_name' => 'required | string | min:2 | max:50',
             'birthdate' => 'required | date | before: -16 years',
             'report_subject' => 'required | min:2 | max:500',
-            'country' => 'required | string | size:2',
-            'phone' => 'required|regex:/^\+?[0-9\s\-\(\)]{10,20}$/',
+            'country' => ['required', new CountryCheck()],
+            'phone' => 'required',
+            'phone_valid' => 'accepted',
             'email' => 'required | email',
         ];
     }
@@ -33,6 +35,7 @@ class FirstStepRequest extends FormRequest
     {
         return [
             'birthdate.before' => 'You must be at least 16 years old.',
+            'phone_valid.accepted' => 'Invalid phone number.',
         ];
     }
 }
