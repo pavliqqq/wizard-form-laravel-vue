@@ -15,7 +15,7 @@ class FileService
         self::defaultImageCopy();
 
         if ($request->hasFile('photo')) {
-            if (!empty($member->photo) && $member->photo !== self::DEFAULT_PHOTO) {
+            if (!empty($member->photo)) {
                 Storage::disk('public')->delete($member->photo);
             }
 
