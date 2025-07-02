@@ -4,7 +4,7 @@
 
 - PHP 8.0 or higher
 - MySQL or MariaDB
-- Node.js 16+ and npm
+- Node.js 22.13 and npm 10.9
 - Git (optional)
 - Composer 2.8 or higher
 - Webpack (via Laravel Mix)
