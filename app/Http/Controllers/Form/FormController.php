@@ -15,7 +15,6 @@ class FormController
     public function firstStep(FirstStepRequest $request)
     {
         $data = $request->validated();
-        unset($data['phone_valid']);
 
         $member = Member::where('email', $data['email'])->first();
 
