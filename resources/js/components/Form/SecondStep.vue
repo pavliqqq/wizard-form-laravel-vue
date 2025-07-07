@@ -1,58 +1,44 @@
 <template>
     <div class="max-w-2xl mx-auto mt-10 mb-10 p-6 bg-white shadow rounded">
-        <h2 class="text-xl text-center font-semibold mb-6" id="form_title">To participate in the conference, please fill
-            out the form</h2>
+        <h2 class="text-xl text-center font-semibold mb-6">
+            To participate in the conference, please fill out the form
+        </h2>
 
         <div class="space-y-4 mb-4">
             <div class="flex flex-col">
-                <input
+                <BaseInput
                     name="company"
-                    type="text"
                     placeholder="Company"
                     v-model="Data.company"
-                    class="border p-2 rounded w-full outline-none focus-within:border-gray-800 focus:border-gray-800"
+                    :errors="errors"
                 />
-                <div v-if="errors.company" class="text-red-600 text-sm mt-1">
-                    {{ errors.company }}
-                </div>
             </div>
 
             <div class="flex flex-col">
-                <input
+                <BaseInput
                     name="position"
-                    type="text"
                     placeholder="Position"
                     v-model="Data.position"
-                    class="border p-2 rounded w-full outline-none focus-within:border-gray-800 focus:border-gray-800"
+                    :errors="errors"
                 />
-                <div v-if="errors.position" class="text-red-600 text-sm mt-1">
-                    {{ errors.position }}
-                </div>
             </div>
 
             <div class="flex flex-col">
-                <textarea
+                <BaseTextArea
                     name="about_me"
-                    placeholder="About me"
-                    v-model="Data.about_me"
-                    class="border p-2 rounded w-full resize-y outline-none focus-within:border-gray-800 focus:border-gray-800">
-                </textarea>
-                <div v-if="errors.about_me" class="text-red-600 text-sm mt-1">
-                    {{ errors.about_me }}
-                </div>
+                    placeholder="About Me"
+                    v-model="Data.aboutMe"
+                    :errors="errors"
+                />
             </div>
 
             <div class="flex flex-col">
-                <input
+                <FileInput
                     name="photo"
-                    type="file"
-                    accept="image/*"
-                    @change="fileChange"
-                    class="border p-2 rounded w-full  focus-within:border-gray-800 focus:border-gray-800"
+                    v-model="Data.photo"
+                    :maxSizeKb="500"
+                    :errors="errors"
                 />
-                <div v-if="errors.photo" class="text-red-600 text-sm mt-1">
-                    {{ errors.photo }}
-                </div>
             </div>
         </div>
 
@@ -73,9 +59,13 @@
 </template>
 
 <script setup>
+
 import {ref, inject, onMounted} from 'vue';
 import router from "../../router.js";
-
+import {toSnakeCase} from "../../utils/caseConverter.js";
+import BaseInput from "../BaseInput.vue";
+import BaseTextArea from "../BaseTextArea.vue";
+import FileInput from "../FileInput.vue";
 
 const showErrors = inject('showErrors');
 const clearErrors = inject('clearErrors');
@@ -86,27 +76,9 @@ const Data = ref({
     id: '',
     company: '',
     position: '',
-    about_me: '',
+    aboutMe: '',
     photo: null,
 });
-
-
-function fileChange(event) {
-    const file = event.target.files[0];
-
-    if (!file) return
-
-    const maxSizeKb = 500
-    const maxSizeBytes = maxSizeKb * 1024
-
-    if (file.size > maxSizeBytes) {
-        showErrors({photo: [`File must be less than ${maxSizeKb}Kb`]})
-        return
-    }
-
-    clearErrors();
-    Data.value.photo = file;
-}
 
 function goToFirstStep() {
     router.push({name: 'first.step'});
@@ -122,14 +94,26 @@ onMounted(() => {
 })
 
 async function secondStepSubmit() {
+    if (Data.value.photo && errors.photo) {
+        return;
+    }
+
     Data.value.id = localStorage.getItem('id');
     localStorage.setItem('secondStep', JSON.stringify(Data.value))
-    const sendFormData = new FormData();
 
-    sendFormData.append('id', Data.value.id);
-    sendFormData.append('company', Data.value.company);
-    sendFormData.append('position', Data.value.position);
-    sendFormData.append('about_me', Data.value.about_me);
+    const plainData = {
+        id: Data.value.id,
+        company: Data.value.company,
+        position: Data.value.position,
+        aboutMe: Data.value.aboutMe,
+    };
+
+    const snakeCaseData = toSnakeCase(plainData);
+
+    const sendFormData = new FormData();
+    for (const [key, value] of Object.entries(snakeCaseData)) {
+        sendFormData.append(key, value);
+    }
 
     if (Data.value.photo instanceof File) {
         sendFormData.append('photo', Data.value.photo);
