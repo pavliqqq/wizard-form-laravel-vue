@@ -22,7 +22,7 @@
                         <img
                             :src="`/storage/${member.photo}`"
                             :alt="member.full_name"
-                             class="h-12 w-12 object-cover rounded-full"
+                            class="h-12 w-12 object-cover rounded-full"
                         />
                     </td>
                     <td class="p-3 break-words">{{ member.full_name }}</td>
@@ -85,7 +85,7 @@
                     <td class="p-3">
                         <input
                             type="text"
-                            v-model="editForm.full_name"
+                            v-model="editForm.fullName"
                             class="w-full border border-gray-300 rounded px-2 py-1 text-sm"
                         />
                         <div class="text-red-600 text-sm mt-1 min-h-[1.25rem]">
@@ -94,7 +94,7 @@
                     </td>
                     <td class="p-3">
                         <input type="text"
-                               v-model="editForm.report_subject"
+                               v-model="editForm.reportSubject"
                                class="w-full border border-gray-300 rounded px-2 py-1 text-sm"
                         />
                         <div class="text-red-600 text-sm mt-1 min-h-[1.25rem]">
@@ -137,6 +137,7 @@
 <script setup>
 
 import {inject, onMounted, ref} from "vue";
+import {toSnakeCase} from "../../utils/caseConverter.js";
 
 const members = ref([])
 
@@ -153,8 +154,8 @@ const props = defineProps({
 });
 
 const editForm = ref({
-    full_name: '',
-    report_subject: '',
+    fullName: '',
+    reportSubject: '',
     email: ''
 })
 
@@ -166,12 +167,13 @@ function isEdit(id) {
 function changeMember(member) {
     editMemberId.value = member.id
     editForm.value = {
-        full_name: member.full_name,
-        report_subject: member.report_subject,
+        fullName: member.full_name,
+        reportSubject: member.report_subject,
         email: member.email
     }
     editPhoto.value = null;
     editPhotoPreview.value = null;
+
     clearErrors();
 }
 
@@ -212,11 +214,18 @@ async function getMembers() {
 }
 
 async function updateMember(id) {
-    const sendFormData = new FormData();
+    const plainData = {
+        fullName: editForm.value.fullName,
+        reportSubject: editForm.value.reportSubject,
+        email: editForm.value.email,
+    };
 
-    sendFormData.append('full_name', editForm.value.full_name);
-    sendFormData.append('report_subject', editForm.value.report_subject);
-    sendFormData.append('email', editForm.value.email);
+    const snakeCaseData = toSnakeCase(plainData);
+
+    const sendFormData = new FormData();
+    for (const [key, value] of Object.entries(snakeCaseData)) {
+        sendFormData.append(key, value);
+    }
 
     if (editPhoto.value) {
         sendFormData.append('photo', editPhoto.value);
