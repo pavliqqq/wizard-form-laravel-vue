@@ -1,13 +1,15 @@
 <template>
     <Map v-if="showMap"></Map>
-    <Logout v-if="isAdmin"/>
+    <div class="mt-3 mr-3 text-right">
+        <LogoutButton v-if="isAdmin"/>
+    </div>
     <router-view :errors="errors" :is-admin="isAdmin"/>
 </template>
 
 
 <script setup>
 import {reactive, provide, ref, computed} from 'vue'
-import Logout from "./Admin/Logout.vue";
+import LogoutButton from "./Admin/LogoutButton.vue";
 import Map from "./Map/Map.vue";
 import {useRoute} from "vue-router";
 
