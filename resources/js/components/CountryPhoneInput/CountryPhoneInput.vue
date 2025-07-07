@@ -7,8 +7,8 @@
             @validate="onValidate"
             @blur="onBlur"
         />
-        <div v-if="(!phoneValid && touched) || errors.phone " class="error-message text-red-600 text-sm mt-1">
-            {{ errors.phone || errors.phone_valid || 'Invalid phone number.' }}
+        <div v-if="(!phoneValid && touched) || error " class="error-message text-red-600 text-sm mt-1">
+            {{ error || 'Invalid phone number.' }}
         </div>
     </div>
 </template>
@@ -17,7 +17,7 @@
 <script setup>
 import {VueTelInput} from "vue-tel-input";
 import "vue-tel-input/vue-tel-input.css";
-import { ref, watch} from "vue";
+import {computed, ref, watch} from "vue";
 
 const props = defineProps({
     phone: String,
@@ -26,7 +26,7 @@ const props = defineProps({
     errors: Object,
 });
 
-const emit = defineEmits(['update:phone', 'update:country', 'update:phoneValid'])
+const emit = defineEmits(['update:phone', 'update:country'])
 
 const phone = ref(props.phone)
 const country = ref(props.country)
@@ -44,7 +44,6 @@ function updateCountry(newCountry) {
 
 function onValidate(phoneObject) {
     phoneValid.value = phoneObject.valid
-    emit('update:phoneValid', phoneObject.valid)
 }
 
 function onBlur() {
@@ -70,4 +69,6 @@ const phoneOptions = {
         placeholder: 'Phone number',
     },
 }
+
+const error = computed(() => props.errors[phoneOptions.inputOptions.name] ?? null)
 </script>
