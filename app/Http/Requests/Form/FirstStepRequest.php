@@ -25,8 +25,7 @@ class FirstStepRequest extends FormRequest
             'birthdate' => 'required | date | before: -16 years',
             'report_subject' => 'required | min:2 | max:500',
             'country' => ['required', new CountryCheck()],
-            'phone' => 'required',
-            'phone_valid' => 'accepted',
+            'phone' => 'required | string | min:10 | max: 20',
             'email' => 'required | email',
         ];
     }
@@ -35,7 +34,6 @@ class FirstStepRequest extends FormRequest
     {
         return [
             'birthdate.before' => 'You must be at least 16 years old.',
-            'phone_valid.accepted' => 'Invalid phone number.',
         ];
     }
 }
