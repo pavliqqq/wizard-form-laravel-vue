@@ -1,81 +1,55 @@
 <template>
     <div class="max-w-2xl mx-auto mt-10 mb-10 p-6 bg-white shadow rounded">
-        <h2 class="text-xl text-center font-semibold mb-6" id="form_title">
+        <h2 class="text-xl text-center font-semibold mb-6">
             To participate in the conference, please fill out the form
         </h2>
 
         <div class="flex flex-col space-y-4">
             <div class="flex flex-col">
-                <input
+                <BaseInput
                     name="first_name"
-                    type="text"
                     placeholder="First Name"
-                    v-model="formData.first_name"
-                    class="border p-2 rounded w-full outline-none focus-within:border-gray-800 focus:border-gray-800"
+                    v-model="formData.firstName"
+                    :errors="errors"
                 />
-                <div v-if="errors.first_name" class="text-red-600 text-sm mt-1">
-                    {{ errors.first_name }}
-                </div>
             </div>
-
             <div class="flex flex-col">
-                <input
+                <BaseInput
                     name="last_name"
-                    type="text"
                     placeholder="Last Name"
-                    v-model="formData.last_name"
-                    class="border p-2 rounded w-full outline-none focus-within:border-gray-800 focus:border-gray-800"
+                    v-model="formData.lastName"
+                    :errors="errors"
                 />
-                <div v-if="errors.last_name" class="text-red-600 text-sm mt-1">
-                    {{ errors.last_name }}
-                </div>
             </div>
-
             <div class="flex flex-col">
-                <input
-                    name="birthdate"
-                    type="date"
+                <BirthdateInput
                     v-model="formData.birthdate"
-                    :max=birthdate
-                    class="border p-2 rounded w-full outline-none focus-within:border-gray-800 focus:border-gray-800"
+                    :errors="errors"
                 />
-                <div v-if="errors.birthdate" class="text-red-600 text-sm mt-1">
-                    {{ errors.birthdate }}
-                </div>
             </div>
-
             <div class="flex flex-col">
-                <input
+                <BaseInput
                     name="report_subject"
-                    type="text"
                     placeholder="Report Subject"
-                    v-model="formData.report_subject"
-                    class="border p-2 rounded w-full outline-none focus-within:border-gray-800 focus:border-gray-800"
+                    v-model="formData.reportSubject"
+                    :errors="errors"
                 />
-                <div v-if="errors.report_subject" class="text-red-600 text-sm mt-1">
-                    {{ errors.report_subject }}
-                </div>
             </div>
-
-            <PhoneInput
-                v-model:phone="formData.phone"
-                v-model:country="formData.country"
-                v-model:phoneValid="formData.phone_valid"
-                :key="renderKey"
-                :errors="errors"
-            />
-
             <div class="flex flex-col">
-                <input
+                <PhoneInput
+                    v-model:phone="formData.phone"
+                    v-model:country="formData.country"
+                    :key="renderKey"
+                    :errors="errors"
+                />
+            </div>
+            <div class="flex flex-col">
+                <BaseInput
                     name="email"
-                    type="text"
                     placeholder="Email"
                     v-model="formData.email"
-                    class="border p-2 rounded w-full outline-none focus-within:border-gray-800 focus:border-gray-800"
+                    :errors="errors"
                 />
-                <div v-if="errors.email" class="text-red-600 text-sm mt-1">
-                    {{ errors.email }}
-                </div>
             </div>
         </div>
 
@@ -92,8 +66,11 @@
 <script setup>
 
 import PhoneInput from "../CountryPhoneInput/CountryPhoneInput.vue"
+import BaseInput from "../BaseInput.vue";
+import BirthdateInput from "../BirthdateInput.vue";
 import {ref, inject, onMounted} from 'vue'
 import router from "../../router.js";
+import {toSnakeCase} from "../../utils/caseConverter.js";
 
 const showErrors = inject('showErrors')
 const clearErrors = inject('clearErrors')
@@ -101,22 +78,19 @@ const clearErrors = inject('clearErrors')
 const {errors} = defineProps({errors: Object})
 
 const formData = ref({
-    first_name: '',
-    last_name: '',
+    firstName: '',
+    lastName: '',
     birthdate: '',
-    report_subject: '',
+    reportSubject: '',
     country: '',
     phone: '',
-    phone_valid: false,
     email: ''
 });
 
-const birthdate = ref(null)
 const renderKey = ref(0)
 
 onMounted(() => {
     clearErrors()
-    minBirthdate()
 
     const saved = localStorage.getItem('firstStep')
     if (saved) {
@@ -127,16 +101,12 @@ onMounted(() => {
     }
 })
 
-function minBirthdate() {
-    const today = new Date()
-    today.setFullYear(today.getFullYear() - 16)
-    birthdate.value = today.toISOString().split('T')[0]
-}
-
 async function addMember() {
     localStorage.setItem('firstStep', JSON.stringify(formData.value))
+
+    const value = toSnakeCase(formData.value);
     try {
-        const res = await axios.post('/api/members/first', formData.value);
+        const res = await axios.post('/api/members/first', value);
 
         localStorage.setItem('id', res.data.id);
         await router.push({name: 'second.step'});
