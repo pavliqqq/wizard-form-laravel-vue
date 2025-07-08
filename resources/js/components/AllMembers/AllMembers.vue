@@ -1,149 +1,51 @@
 <template>
-    <div class="max-w-7xl mx-auto mt-10 mb-10 p-6 bg-white shadow rounded">
-        <h2 class="text-xl text-center font-semibold mb-4">All Members</h2>
-
-        <table class="w-full border border-gray-300 rounded overflow-hidden table-fixed">
-            <thead class="bg-gray-100">
-            <tr>
-                <th class="p-3 text-left border-b w-[80px]">Photo</th>
-                <th class="p-3 text-left border-b w-[200px] truncate">Full Name</th>
-                <th class="p-3 text-left border-b w-[300px] truncate">Report Subject</th>
-                <th class="p-3 text-left border-b w-[250px] truncate">Email</th>
-                <th v-if="isAdmin" class="p-3 text-left border-b w-[80px] truncate">Edit</th>
-                <th v-if="isAdmin" class="p-3 text-left border-b w-[80px] truncate">Delete</th>
-                <th v-if="isAdmin" class="p-3 text-left border-b w-[80px] truncate">Visible</th>
-            </tr>
-            </thead>
-            <tbody>
-            <template v-for="member in members" :key="member.id">
-                <tr :class="isEdit(member.id) ? 'hidden' : 'border-b'">
-                    <th class="hidden">{{ member.id }}</th>
-                    <td class="p-3">
-                        <img
-                            :src="`/storage/${member.photo}`"
-                            :alt="member.full_name"
-                            class="h-12 w-12 object-cover rounded-full"
-                        />
-                    </td>
-                    <td class="p-3 break-words">{{ member.full_name }}</td>
-                    <td class="p-3 break-words">{{ member.report_subject }}</td>
-                    <td class="p-3 break-words">
-                        <a :href="`https://mail.google.com/mail/?view=cm&fs=1&to=${member.email}`"
-                           target="_blank"
-                           class="text-blue-600 hover:underline"
-                        >
-                            {{ member.email }}
-                        </a>
-                    </td>
-                    <td v-if="isAdmin" class="p-3">
-                        <button
-                            @click.prevent="changeMember(member)"
-                            class="underline text-orange-600"
-                        >
-                            Edit
-                        </button>
-                    </td>
-                    <td v-if="isAdmin" class="p-3">
-                        <button
-                            @click.prevent="deleteMember(member.id)"
-                            class="underline text-red-600"
-                        >
-                            Delete
-                        </button>
-                    </td>
-                    <td v-if="isAdmin" class="p-3">
-                        <button
-                            @click.prevent="toggleVisibility(member)"
-                            :class="member.visibility ? 'text-green-600' : 'text-gray-400'"
-                            class="underline"
-                        >
-                            {{ member.visibility ? 'Visible' : 'Hidden' }}
-                        </button>
-                    </td>
-                </tr>
-
-                <tr :class="isEdit(member.id) ? 'border-b bg-white hover:bg-gray-50' : 'hidden'">
-                    <th class="hidden">{{ member.id }}</th>
-                    <td class="p-3">
-                        <label class="block w-12 h-12 relative">
-                            <img
-                                :src="editPhotoPreview || `/storage/${member.photo}`"
-                                alt="photo"
-                                class="w-12 h-12 object-cover rounded-full"
-                            />
-                            <input
-                                type="file"
-                                accept="image/*"
-                                class="absolute inset-0 opacity-0"
-                                @change="fileChange"
-                            />
-                        </label>
-                        <div class="text-red-600 text-sm mt-1 min-h-[1.25rem]">
-                            {{ errors.photo || ' ' }}
-                        </div>
-                    </td>
-                    <td class="p-3">
-                        <input
-                            type="text"
-                            v-model="editForm.fullName"
-                            class="w-full border border-gray-300 rounded px-2 py-1 text-sm"
-                        />
-                        <div class="text-red-600 text-sm mt-1 min-h-[1.25rem]">
-                            {{ errors.full_name || ' ' }}
-                        </div>
-                    </td>
-                    <td class="p-3">
-                        <input type="text"
-                               v-model="editForm.reportSubject"
-                               class="w-full border border-gray-300 rounded px-2 py-1 text-sm"
-                        />
-                        <div class="text-red-600 text-sm mt-1 min-h-[1.25rem]">
-                            {{ errors.report_subject || ' ' }}
-                        </div>
-                    </td>
-                    <td class="p-3">
-                        <input
-                            type="text"
-                            v-model="editForm.email"
-                            class="w-full border border-gray-300 rounded px-2 py-1 text-sm"
-                        />
-                        <div class="text-red-600 text-sm mt-1 min-h-[1.25rem]">
-                            {{ errors.email || ' ' }}
-                        </div>
-                    </td>
-                    <td class="p-3">
-                        <a
-                            href="#"
-                            class="inline-block bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm"
-                            @click.prevent="updateMember(member.id)">
-                            Update
-                        </a>
-                    </td>
-                    <td class="p-3">
-                        <a
-                            href="#"
-                            @click.prevent="editMemberId = null"
-                            class="ml-2 text-sm text-gray-500 hover:underline">
-                            Cancel
-                        </a>
-                    </td>
-                </tr>
-            </template>
-            </tbody>
-        </table>
-    </div>
+    <BaseTable :headers="tableHeaders">
+        <template v-for="member in members" :key="member.id">
+            <MemberRowEdit
+                v-if="isEdit(member.id)"
+                :member="member"
+                :photoPreview="editPhotoPreview"
+                v-model:photo="editPhoto"
+                v-model:fullName="editForm.fullName"
+                v-model:reportSubject="editForm.reportSubject"
+                v-model:email="editForm.email"
+                @update="updateMember"
+                @cancelEdit="cancelEditMember"
+                :errors="errors"
+            />
+            <MemberRow
+                v-else
+                :member="member"
+                :isAdmin="isAdmin"
+                @edit="changeMember"
+                @delete="deleteMember"
+                @toggle="toggleVisibility"
+            />
+        </template>
+    </BaseTable>
 </template>
 
 <script setup>
 
-import {inject, onMounted, ref} from "vue";
+import {inject, onMounted, ref, watch} from "vue";
 import {toSnakeCase} from "../../utils/caseConverter.js";
+import MemberRow from "../MemberRow.vue";
+import MemberRowEdit from "../MemberRowEdit.vue";
+import BaseTable from "../BaseTable.vue";
 
 const members = ref([])
 
 const editMemberId = ref(null)
 const editPhoto = ref(null)
 const editPhotoPreview = ref(null)
+
+watch(editPhoto, (file) => {
+    if (editPhotoPreview.value) {
+        URL.revokeObjectURL(editPhotoPreview.value)
+    }
+
+    editPhotoPreview.value = file ? URL.createObjectURL(file) : null
+})
 
 const showErrors = inject('showErrors')
 const clearErrors = inject('clearErrors')
@@ -153,12 +55,19 @@ const props = defineProps({
     isAdmin: Boolean
 });
 
+const tableHeaders = [
+    "Photo",
+    "Full Name",
+    "Report Subject",
+    "Email",
+    props.isAdmin ? ["Edit", "Delete", "Visible"] : []
+];
+
 const editForm = ref({
     fullName: '',
     reportSubject: '',
     email: ''
 })
-
 
 function isEdit(id) {
     return editMemberId.value === id;
@@ -177,22 +86,11 @@ function changeMember(member) {
     clearErrors();
 }
 
-function fileChange(event) {
-    const file = event.target.files[0];
-
-    if (!file) return
-
-    const maxSizeKb = 500
-    const maxSizeBytes = maxSizeKb * 1024
-
-    if (file.size > maxSizeBytes) {
-        showErrors({photo: [`File must be less than ${maxSizeKb}Kb`]})
-        return
-    }
-
-    clearErrors();
-    editPhoto.value = file;
-    editPhotoPreview.value = URL.createObjectURL(file);
+function cancelEditMember() {
+    editMemberId.value = null
+    editForm.value = {fullName: '', reportSubject: '', email: ''}
+    editPhoto.value = null
+    editPhotoPreview.value = null
 }
 
 async function getMembers() {
