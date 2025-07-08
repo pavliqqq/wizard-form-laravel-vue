@@ -3,32 +3,17 @@
     <div class="mt-3 mr-3 text-right">
         <LogoutButton v-if="isAdmin"/>
     </div>
-    <router-view :errors="errors" :is-admin="isAdmin"/>
+    <router-view :is-admin="isAdmin"/>
 </template>
 
 
 <script setup>
-import {reactive, provide, ref, computed} from 'vue'
+import { provide, ref, computed} from 'vue'
 import LogoutButton from "./Admin/LogoutButton.vue";
 import Map from "./Map/Map.vue";
 import {useRoute} from "vue-router";
 
-const errors = reactive({})
-
 const isAdmin = ref(!!localStorage.getItem('token'))
-
-function clearErrors() {
-    Object.keys(errors).forEach(key => {
-        delete errors[key]
-    })
-}
-
-function showErrors(newErrors) {
-    clearErrors()
-    for (const [key, message] of Object.entries(newErrors)) {
-        errors[key] = message[0]
-    }
-}
 
 const route = useRoute()
 
@@ -38,8 +23,6 @@ const showMap = computed(() => {
     return mapRoutes.includes(route.name)
 })
 
-provide('showErrors', showErrors)
-provide('clearErrors', clearErrors)
 provide('isAdmin', isAdmin)
 </script>
 
