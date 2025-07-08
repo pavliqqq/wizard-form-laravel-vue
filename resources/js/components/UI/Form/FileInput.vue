@@ -5,7 +5,7 @@
         type="file"
         :accept="accept"
         @change="fileChange"
-        class="border p-2 rounded w-full outline-none focus-within:border-gray-800 focus:border-gray-800"
+        :class="props.class || 'border p-2 rounded w-full outline-none focus-within:border-gray-800 focus:border-gray-800'"
     />
     <div v-if="error" class="text-red-600 text-sm mt-1">
         {{ error }}
@@ -25,6 +25,7 @@ const props = defineProps({
     modelValue: null,
     maxSizeKb: Number,
     accept: {type: String, default: 'image/*'},
+    class: String,
     errors: Object
 })
 
