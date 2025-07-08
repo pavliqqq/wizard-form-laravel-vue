@@ -34,16 +34,13 @@
 
 <script setup>
 
-import {inject, ref} from "vue";
+import {ref} from "vue";
 import router from "../../router.js";
 import BaseInput from "../UI/Form/BaseInput.vue";
+import {useErrorStore} from "../../stores/ErrorStore.js";
 
-const showErrors = inject('showErrors')
-const isAdmin = inject('isAdmin')
-
-const props = defineProps({
-    errors: Object
-});
+const errorStore = useErrorStore()
+const errors = errorStore.errors
 
 const formData = ref({
     email: '',
@@ -59,7 +56,7 @@ async function login() {
         await router.push({name: 'all.members'})
     } catch (error) {
         if (error.response && error.response.status === 422) {
-            showErrors(error.response.data.errors)
+            errorStore.showErrors(error.response.data.errors)
         }
     }
 }
