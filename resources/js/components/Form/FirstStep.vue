@@ -68,14 +68,13 @@
 import PhoneInput from "../CountryPhoneInput/CountryPhoneInput.vue"
 import BaseInput from "../UI/Form/BaseInput.vue";
 import BirthdateInput from "../UI/Form/BirthdateInput.vue";
-import {ref, inject, onMounted} from 'vue'
+import {ref, onMounted} from 'vue'
 import router from "../../router.js";
 import {toSnakeCase} from "../../utils/caseConverter.js";
+import {useErrorStore} from "../../stores/errorStore.js";
 
-const showErrors = inject('showErrors')
-const clearErrors = inject('clearErrors')
-
-const {errors} = defineProps({errors: Object})
+const errorStore = useErrorStore()
+const errors = errorStore.errors
 
 const formData = ref({
     firstName: '',
@@ -90,7 +89,7 @@ const formData = ref({
 const renderKey = ref(0)
 
 onMounted(() => {
-    clearErrors()
+    errorStore.clearErrors()
 
     const saved = localStorage.getItem('firstStep')
     if (saved) {
@@ -112,7 +111,7 @@ async function addMember() {
         await router.push({name: 'second.step'});
     } catch (error) {
         if (error.response && error.response.status === 422) {
-            showErrors(error.response.data.errors);
+            errorStore.showErrors(error.response.data.errors);
         }
     }
 }
