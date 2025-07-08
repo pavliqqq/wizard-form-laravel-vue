@@ -60,17 +60,16 @@
 
 <script setup>
 
-import {ref, inject, onMounted} from 'vue';
+import {ref, onMounted} from 'vue';
 import router from "../../router.js";
-import {toSnakeCase} from "../../utils/caseConverter.js";
 import BaseInput from "../UI/Form/BaseInput.vue";
 import BaseTextArea from "../UI/Form/BaseTextArea.vue";
 import FileInput from "../UI/Form/FileInput.vue";
+import {useErrorStore} from "../../stores/ErrorStore.js";
+import {createFormData} from "../../helpers/request.js";
 
-const showErrors = inject('showErrors');
-const clearErrors = inject('clearErrors');
-
-const {errors} = defineProps({errors: Object})
+const errorStore = useErrorStore()
+const errors = errorStore.errors
 
 const Data = ref({
     id: '',
@@ -85,8 +84,9 @@ function goToFirstStep() {
 }
 
 onMounted(() => {
-    clearErrors()
+    errorStore.clearErrors()
     const saved = localStorage.getItem('secondStep')
+    Data.value.id = localStorage.getItem('id');
     if (saved) {
         const parsed = JSON.parse(saved)
         Object.assign(Data.value, parsed)
@@ -98,29 +98,12 @@ async function secondStepSubmit() {
         return;
     }
 
-    Data.value.id = localStorage.getItem('id');
     localStorage.setItem('secondStep', JSON.stringify(Data.value))
 
-    const plainData = {
-        id: Data.value.id,
-        company: Data.value.company,
-        position: Data.value.position,
-        aboutMe: Data.value.aboutMe,
-    };
-
-    const snakeCaseData = toSnakeCase(plainData);
-
-    const sendFormData = new FormData();
-    for (const [key, value] of Object.entries(snakeCaseData)) {
-        sendFormData.append(key, value);
-    }
-
-    if (Data.value.photo instanceof File) {
-        sendFormData.append('photo', Data.value.photo);
-    }
+    const formData = createFormData(Data.value);
 
     try {
-        const res = await axios.post('/api/members/second', sendFormData, {
+        const res = await axios.post('/api/members/second', formData, {
             headers: {'Content-Type': 'multipart/form-data'},
         });
 
@@ -128,7 +111,7 @@ async function secondStepSubmit() {
         await router.push({name: 'third.step'});
     } catch (error) {
         if (error.response && error.response.status === 422) {
-            showErrors(error.response.data.errors);
+            errorStore.showErrors(error.response.data.errors);
         }
     }
 }
