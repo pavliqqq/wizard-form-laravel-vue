@@ -1,12 +1,12 @@
 <template>
-    <tr class="border-b bg-white hover:bg-gray-50">
+    <tr class="border-b bg-white hover:bg-gray-50 text-sm">
         <th class="hidden">{{ member.id }}</th>
         <td class="p-3">
-            <label class="block w-12 h-12 relative">
+            <label class="block w-10 h-10 relative">
                 <img
                     :src="photoPreview || `/storage/${member.photo}`"
                     alt="photo"
-                    class="w-12 h-12 object-cover rounded-full"
+                    class="h-10 w-10 object-cover rounded-full"
                 />
                 <FileInput
                     name="photo"
@@ -19,23 +19,23 @@
             </label>
 
         </td>
-        <td class="p-3">
+        <td class="p-3 break-words max-w-[200px]">
             <BaseInput
-                name="fullName"
+                name="full_name"
                 :modelValue="fullName"
                 @update:modelValue="emit('update:fullName', $event)"
                 :errors="errors"
             />
         </td>
-        <td class="p-3">
+        <td class="p-3 break-words max-w-[200px]">
             <BaseInput
-                name="reportSubject"
+                name="report_subject"
                 :modelValue="reportSubject"
                 @update:modelValue="emit('update:reportSubject', $event)"
                 :errors="errors"
             />
         </td>
-        <td class="p-3">
+        <td class="p-3 break-words max-w-[200px]">
             <BaseInput
                 name="email"
                 :modelValue="email"
@@ -43,14 +43,14 @@
                 :errors="errors"
             />
         </td>
-        <td class="p-3">
+        <td class="p-3 whitespace-nowrap">
             <button
                 class="inline-block bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm"
                 @click="$emit('update', member.id)">
                 Update
             </button>
         </td>
-        <td class="p-3">
+        <td class="p-3 whitespace-nowrap">
             <button
                 class="ml-2 text-sm text-gray-500 hover:underline"
                 @click="$emit('cancelEdit')">
