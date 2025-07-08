@@ -66,8 +66,8 @@
 <script setup>
 
 import PhoneInput from "../CountryPhoneInput/CountryPhoneInput.vue"
-import BaseInput from "../BaseInput.vue";
-import BirthdateInput from "../BirthdateInput.vue";
+import BaseInput from "../UI/Form/BaseInput.vue";
+import BirthdateInput from "../UI/Form/BirthdateInput.vue";
 import {ref, inject, onMounted} from 'vue'
 import router from "../../router.js";
 import {toSnakeCase} from "../../utils/caseConverter.js";

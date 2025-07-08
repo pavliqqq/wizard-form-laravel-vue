@@ -63,9 +63,9 @@
 import {ref, inject, onMounted} from 'vue';
 import router from "../../router.js";
 import {toSnakeCase} from "../../utils/caseConverter.js";
-import BaseInput from "../BaseInput.vue";
-import BaseTextArea from "../BaseTextArea.vue";
-import FileInput from "../FileInput.vue";
+import BaseInput from "../UI/Form/BaseInput.vue";
+import BaseTextArea from "../UI/Form/BaseTextArea.vue";
+import FileInput from "../UI/Form/FileInput.vue";
 
 const showErrors = inject('showErrors');
 const clearErrors = inject('clearErrors');

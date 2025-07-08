@@ -36,7 +36,7 @@
 
 import {inject, ref} from "vue";
 import router from "../../router.js";
-import BaseInput from "../BaseInput.vue";
+import BaseInput from "../UI/Form/BaseInput.vue";
 
 const showErrors = inject('showErrors')
 const isAdmin = inject('isAdmin')
