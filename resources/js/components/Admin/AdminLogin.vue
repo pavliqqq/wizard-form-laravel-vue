@@ -37,7 +37,7 @@
 import {ref} from "vue";
 import router from "../../router.js";
 import BaseInput from "../UI/Form/BaseInput.vue";
-import {useErrorStore} from "../../stores/ErrorStore.js";
+import {useErrorStore} from "../../stores/errorStore.js";
 
 const errorStore = useErrorStore()
 const errors = errorStore.errors

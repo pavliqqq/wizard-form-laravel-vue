@@ -65,7 +65,7 @@ import router from "../../router.js";
 import BaseInput from "../UI/Form/BaseInput.vue";
 import BaseTextArea from "../UI/Form/BaseTextArea.vue";
 import FileInput from "../UI/Form/FileInput.vue";
-import {useErrorStore} from "../../stores/ErrorStore.js";
+import {useErrorStore} from "../../stores/errorStore.js";
 import {createFormData} from "../../helpers/request.js";
 
 const errorStore = useErrorStore()
