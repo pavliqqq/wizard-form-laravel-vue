@@ -7,7 +7,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class Admin extends Model
 {
-   use HasApiTokens;
+    use HasApiTokens;
     protected $fillable = [
         'email',
         'password'
