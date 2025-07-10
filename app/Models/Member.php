@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use App\Observers\DeleteOldFilesObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 
+#[ObservedBy([DeleteOldFilesObserver::class])]
 class Member extends Model
 {
     protected $fillable = [
@@ -18,5 +21,6 @@ class Member extends Model
         'position',
         'about_me',
         'photo',
+        'visibility'
     ];
 }
