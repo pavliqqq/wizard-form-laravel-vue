@@ -29,11 +29,13 @@ composer install
 ```bash
 cp .env.example .env
 ```
+
 Edit the .env file to configure your environment variables (database, app key, etc.):
 
 ```bash
 php artisan key:generate
 ```
+
 ### 4. Install JS dependencies
 
 ```bash
@@ -43,25 +45,25 @@ npm run dev
 
 ### 5. Database Setup
 
-1) Connect to MySQL server:
+1. Connect to MySQL server:
 
 ```bash
 mysql -u root -p
 ```
 
-2) Create the database:
+2. Create the database:
 
 ```bash
 CREATE DATABASE wizardForm CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-3) Exit MySQL:
+3. Exit MySQL:
 
 ```bash
 exit
 ```
 
-4) Run the import command (for PowerShell):
+4. Run the import command (for PowerShell):
 
 ```bash
 Get-Content .\database\dump.sql | mysql -u root -p wizardForm
@@ -69,15 +71,15 @@ Get-Content .\database\dump.sql | mysql -u root -p wizardForm
 
 If the above command didn’t work, follow these steps:
 
-5) Open your command prompt (cmd).
+5. Open your command prompt (cmd).
 
-6) Navigate to the project directory, for example:
+6. Navigate to the project directory, for example:
 
 ```bash
 cd path\to\your\project
 ```
 
-7) Run the import command:
+7. Run the import command:
 
 ```bash
 mysql -u root -p wizardForm < database/dump.sql
@@ -98,7 +100,7 @@ php artisan serve
 Project will be accessible at:
 http://localhost:8000
 
-The database contains a default admin user seeded 
+The database contains a default admin user seeded
 with email: admin@gmail.com and password: 12345.
 
 You can access the admin login page at:

@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Member;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Storage;
 
@@ -23,7 +22,7 @@ class FileService
 
     private static function defaultImageCopy(): void
     {
-        if (!Storage::disk('public')->exists(self::DEFAULT_PHOTO)) {
+        if (! Storage::disk('public')->exists(self::DEFAULT_PHOTO)) {
             $source = public_path(self::DEFAULT_PHOTO);
             $target = Storage::disk('public')->path(self::DEFAULT_PHOTO);
 

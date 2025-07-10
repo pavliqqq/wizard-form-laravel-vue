@@ -21,6 +21,6 @@ class Member extends Model
         'position',
         'about_me',
         'photo',
-        'visibility'
+        'visibility',
     ];
 }

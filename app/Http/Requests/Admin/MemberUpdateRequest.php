@@ -21,9 +21,9 @@ class MemberUpdateRequest extends FormRequest
     {
         return [
             'photo' => 'nullable | image | mimes:jpg,jpeg,png,gif | max:512',
-            'full_name' => ['required', 'string', 'min:2', 'max:100', new FullNameCheck()],
+            'full_name' => ['required', 'string', 'min:2', 'max:100', new FullNameCheck],
             'report_subject' => 'required | min:2 | max:500',
-            'email' => 'required | email'
+            'email' => 'required | email',
         ];
     }
 }
