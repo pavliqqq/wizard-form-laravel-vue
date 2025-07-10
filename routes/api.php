@@ -2,15 +2,15 @@
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AuthController;
-use App\Http\Controllers\Form\FormController;
+use App\Http\Controllers\Member\MemberController;
 use Illuminate\Support\Facades\Route;
 
 
 Route::prefix('members')->group(function (){
-    Route::post('/first', [FormController::class, 'firstStep']);
-    Route::get('/all', [FormController::class, 'getAllMembers']);
-    Route::post('/second', [FormController::class, 'secondStep']);
-    Route::get('/third', [FormController::class, 'thirdStep']);
+    Route::post('/first', [MemberController::class, 'store']);
+    Route::get('/', [MemberController::class, 'index']);
+    Route::patch('/{member}', [MemberController::class, 'update']);
+    Route::get('/third', [MemberController::class, 'thirdStep']);
 });
 
 Route::prefix('admin')->group(function (){
