@@ -17,7 +17,6 @@
                     :errors="errors"
                 />
             </label>
-
         </td>
         <td class="p-3 break-words max-w-[200px]">
             <BaseInput
@@ -46,14 +45,16 @@
         <td class="p-3 whitespace-nowrap">
             <button
                 class="inline-block bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm"
-                @click="$emit('update', member.id)">
+                @click="$emit('update', member.id)"
+            >
                 Update
             </button>
         </td>
         <td class="p-3 whitespace-nowrap">
             <button
                 class="ml-2 text-sm text-gray-500 hover:underline"
-                @click="$emit('cancelEdit')">
+                @click="$emit('cancelEdit')"
+            >
                 Cancel
             </button>
         </td>
@@ -61,7 +62,6 @@
 </template>
 
 <script setup>
-
 import FileInput from "./UI/Form/FileInput.vue";
 import BaseInput from "./UI/Form/BaseInput.vue";
 
@@ -72,16 +72,15 @@ const props = defineProps({
     fullName: String,
     reportSubject: String,
     email: String,
-    errors: Object
-})
+    errors: Object,
+});
 
 const emit = defineEmits([
-    'update:photo',
-    'update:fullName',
-    'update:reportSubject',
-    'update:email',
-    'update',
-    'cancelEdit'
-])
-
+    "update:photo",
+    "update:fullName",
+    "update:reportSubject",
+    "update:email",
+    "update",
+    "cancelEdit",
+]);
 </script>

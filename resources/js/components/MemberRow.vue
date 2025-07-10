@@ -9,11 +9,14 @@
             />
         </td>
         <td class="p-3 break-words max-w-[200px]">{{ member.full_name }}</td>
-        <td class="p-3 break-words max-w-[200px]">{{ member.report_subject }}</td>
+        <td class="p-3 break-words max-w-[200px]">
+            {{ member.report_subject }}
+        </td>
         <td class="p-3 break-all max-w-[200px]">
-            <a :href="`https://mail.google.com/mail/?view=cm&fs=1&to=${member.email}`"
-               target="_blank"
-               class="text-blue-600 hover:underline"
+            <a
+                :href="`https://mail.google.com/mail/?view=cm&fs=1&to=${member.email}`"
+                target="_blank"
+                class="text-blue-600 hover:underline"
             >
                 {{ member.email }}
             </a>
@@ -40,19 +43,17 @@
                 :class="member.visibility ? 'text-green-600' : 'text-gray-400'"
                 class="underline"
             >
-                {{ member.visibility ? 'Visible' : 'Hidden' }}
+                {{ member.visibility ? "Visible" : "Hidden" }}
             </button>
         </td>
     </tr>
 </template>
 
 <script setup>
-
 const props = defineProps({
     member: Object,
-    isAdmin: Boolean
-})
+    isAdmin: Boolean,
+});
 
-const emit = defineEmits(['edit', 'delete', 'toggle']);
-
+const emit = defineEmits(["edit", "delete", "toggle"]);
 </script>

@@ -6,13 +6,15 @@
                 <a
                     :href="facebookUrl"
                     target="_blank"
-                    class="bg-blue-600 text-white px-4 py-2 rounded">
+                    class="bg-blue-600 text-white px-4 py-2 rounded"
+                >
                     Share on Facebook
                 </a>
                 <a
                     :href="twitterUrl"
                     target="_blank"
-                    class="bg-blue-400 text-white px-4 py-2 rounded">
+                    class="bg-blue-400 text-white px-4 py-2 rounded"
+                >
                     Share on Twitter
                 </a>
             </div>
@@ -21,53 +23,51 @@
         <div class="flex justify-between items-center mt-6">
             <button
                 type="button"
-                @click="startOver()"
-                class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded transition-colors duration-200">
+                @click="startOver"
+                class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded transition-colors duration-200"
+            >
                 Start over
             </button>
             <a
                 href="#"
                 @click.prevent="goToAllMembers"
-                class="text-blue-600 underline">
+                class="text-blue-600 underline"
+            >
                 All members ({{ count }})
             </a>
-
         </div>
     </div>
 </template>
 
 <script setup>
-import {ref, onMounted} from 'vue'
-import router from "../../router.js"
+import { ref, onMounted } from "vue";
+import router from "../../router.js";
 
-const count = ref(null)
-const facebookUrl = ref(null)
-const twitterUrl = ref(null)
-
+const count = ref(null);
+const facebookUrl = ref(null);
+const twitterUrl = ref(null);
 
 onMounted(() => {
     getFbTwUrl();
-    count.value = localStorage.getItem('count')
-})
+    count.value = localStorage.getItem("count");
+});
 
 function startOver() {
-    ['firstStep', 'secondStep', 'count', 'id'].forEach(k => localStorage.removeItem(k))
-
-    router.push({name: 'first.step'})
+    localStorage.clear();
+    router.go(0);
 }
 
-
 function goToAllMembers() {
-    router.push({name: 'all.members'})
+    router.push({ name: "all.members" });
 }
 
 async function getFbTwUrl() {
     try {
-        const res = await axios.get('/api/members/third')
-        facebookUrl.value = res.data.facebookUrl
-        twitterUrl.value = res.data.twitterUrl
+        const res = await axios.get("/api/members/share");
+        facebookUrl.value = res.data.facebookUrl;
+        twitterUrl.value = res.data.twitterUrl;
     } catch (e) {
-        console.error('Failed to load URLs', e)
+        console.error("Failed to load URLs", e);
     }
 }
 </script>
