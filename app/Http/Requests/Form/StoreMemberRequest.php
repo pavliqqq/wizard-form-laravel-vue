@@ -4,8 +4,9 @@ namespace App\Http\Requests\Form;
 
 use App\Rules\CountryCheck;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class FirstStepRequest extends FormRequest
+class StoreMemberRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -26,7 +27,12 @@ class FirstStepRequest extends FormRequest
             'report_subject' => 'required | min:2 | max:500',
             'country' => ['required', new CountryCheck()],
             'phone' => 'required | string | min:10 | max: 20',
-            'email' => 'required | email',
+            'email' => ['required', Rule::unique('members'), 'email:rfc,dns'],
+            'company' => 'nullable | string | min: 2 | max: 100',
+            'position' => 'nullable | string | min: 2 | max: 100',
+            'about_me' => 'nullable | min: 2 | max: 1000',
+            'photo' => 'nullable | image | mimes:jpg,jpeg,png,gif | max:512',
+            'visibility' => 'nullable | boolean'
         ];
     }
 
