@@ -5,6 +5,7 @@
         <form @submit.prevent="login" class="flex flex-col space-y-4">
             <div class="flex flex-col">
                 <BaseInput
+                    name="email"
                     placeholder="email"
                     v-model="formData.email"
                     :errors="errors"
@@ -13,6 +14,7 @@
 
             <div class="flex flex-col">
                 <BaseInput
+                    name="password"
                     type="password"
                     placeholder="password"
                     v-model="formData.password"
@@ -23,7 +25,8 @@
             <div class="text-right pt-6">
                 <button
                     type="submit"
-                    class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded">
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded"
+                >
                     Login
                 </button>
             </div>
@@ -31,34 +34,35 @@
     </div>
 </template>
 
-
 <script setup>
-
 import {ref} from "vue";
 import router from "../../router.js";
 import BaseInput from "../UI/Form/BaseInput.vue";
 import {useErrorStore} from "../../stores/errorStore.js";
+import {useAdminStore} from "../../stores/adminStore.js";
 
-const errorStore = useErrorStore()
-const errors = errorStore.errors
+const errorStore = useErrorStore();
+const errors = errorStore.errors;
+
+const adminStore = useAdminStore();
 
 const formData = ref({
-    email: '',
-    password: '',
-})
+    email: "",
+    password: "",
+});
 
 async function login() {
     try {
-        const res = await axios.post('/api/admin/login', formData.value)
+        await axios.get('/sanctum/csrf-cookie');
+        const res = await axios.post("/api/admin/login", formData.value);
 
-        localStorage.setItem('token', res.data.token)
-        isAdmin.value = true
-        await router.push({name: 'all.members'})
+        localStorage.setItem("token", res.data.token);
+        adminStore.isAdmin = true;
+        await router.push({name: "all.members"});
     } catch (error) {
         if (error.response && error.response.status === 422) {
-            errorStore.showErrors(error.response.data.errors)
+            errorStore.showErrors(error.response.data.errors);
         }
     }
 }
-
 </script>
