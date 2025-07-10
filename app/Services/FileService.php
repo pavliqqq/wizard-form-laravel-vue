@@ -10,18 +10,15 @@ class FileService
 {
     public const DEFAULT_PHOTO = 'images/default.png';
 
-    public static function photoService(FormRequest $request, Member $member): string
+    public static function photoService(FormRequest $request): string
     {
         self::defaultImageCopy();
 
         if ($request->hasFile('photo')) {
-            if (!empty($member->photo) && $member->photo !== self::DEFAULT_PHOTO) {
-                Storage::disk('public')->delete($member->photo);
-            }
-
             return $request->file('photo')->store('images', 'public');
         }
-        return $member->photo ?: self::DEFAULT_PHOTO;
+
+        return self::DEFAULT_PHOTO;
     }
 
     private static function defaultImageCopy(): void
