@@ -1,14 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Member;
-
+namespace App\Http\Controllers\API;
 
 use App\Http\Requests\Form\StoreMemberRequest;
 use App\Http\Requests\Form\UpdateMemberRequest;
 use App\Models\Member;
-use App\Services\AuthService;
 use App\Services\FileService;
-use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class MemberController
@@ -22,7 +19,7 @@ class MemberController
 
         $member = Member::create($data);
 
-        return response()->json(['id' => $member->id]);
+        return response()->json(['success' => true, 'id' => $member->id, 'email' => $member->email]);
     }
 
     public function update(UpdateMemberRequest $request, Member $member)
@@ -36,7 +33,7 @@ class MemberController
         $member->update($data);
         $count = Member::count();
 
-        return response()->json(['count' => $count]);
+        return response()->json(['success' => true, 'count' => $count]);
     }
 
     public function index()
@@ -52,17 +49,17 @@ class MemberController
             $result[] = [
                 'id' => $member['id'],
                 'photo' => $member['photo'],
-                'full_name' => $member['first_name'] . ' ' . $member['last_name'],
+                'full_name' => $member['first_name'].' '.$member['last_name'],
                 'report_subject' => $member['report_subject'],
                 'email' => $member['email'],
+                'visibility' => $member['visibility'],
             ];
         }
 
-        return response()->json(['members' => $result]);
+        return response()->json(['success' => true, 'members' => $result]);
     }
 
-
-    public function thirdStep()
+    public function sharePage()
     {
         $shareConfig = config('share');
         $appConfig = config('app');
@@ -71,9 +68,27 @@ class MemberController
 
         $tweetText = $shareConfig['tweetText'];
 
-        $facebookUrl = 'https://www.facebook.com/sharer/sharer.php?u=' . urlencode($shareUrl);
-        $twitterUrl = 'https://twitter.com/intent/tweet?text=' . urlencode($tweetText) . '&url=' . urlencode($shareUrl);
+        $facebookUrl = 'https://www.facebook.com/sharer/sharer.php?u='.urlencode($shareUrl);
+        $twitterUrl = 'https://twitter.com/intent/tweet?text='.urlencode($tweetText).'&url='.urlencode($shareUrl);
 
-        return response()->json(['facebookUrl' => $facebookUrl, 'twitterUrl' => $twitterUrl]);
+        return response()->json(['success' => true, 'facebookUrl' => $facebookUrl, 'twitterUrl' => $twitterUrl]);
+    }
+
+    public function toggleVisibility(Member $member)
+    {
+        $member->visibility = ! $member->visibility;
+        $member->save();
+
+        return response()->json([
+            'success' => true,
+            'visible' => $member->visibility,
+        ]);
+    }
+
+    public function destroy(Member $member)
+    {
+        $member->delete();
+
+        return response()->json(['success' => true]);
     }
 }

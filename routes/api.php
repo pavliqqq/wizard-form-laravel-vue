@@ -1,29 +1,23 @@
 <?php
 
-use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\Admin\AuthController;
-use App\Http\Controllers\Member\MemberController;
+use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\MemberController;
 use Illuminate\Support\Facades\Route;
 
-
-Route::prefix('members')->group(function (){
-    Route::post('/first', [MemberController::class, 'store']);
+Route::prefix('members')->group(function () {
+    Route::post('/', [MemberController::class, 'store']);
     Route::get('/', [MemberController::class, 'index']);
     Route::patch('/{member}', [MemberController::class, 'update']);
-    Route::get('/third', [MemberController::class, 'thirdStep']);
+    Route::get('/share', [MemberController::class, 'sharePage']);
 });
 
-Route::prefix('admin')->group(function (){
+Route::prefix('admin')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
 
-    Route::middleware('auth:sanctum')->group(function(){
+    Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
 
-        Route::prefix('members')->group(function () {
-            Route::post('/{member}', [AdminController::class, 'update']);
-            Route::post('/toggle/{member}', [AdminController::class, 'toggleVisibility']);
-            Route::delete('/{member}', [AdminController::class, 'delete']);
-        });
+        Route::post('/toggle/{member}', [MemberController::class, 'toggleVisibility']);
+        Route::delete('/{member}', [MemberController::class, 'destroy']);
     });
 });
-
