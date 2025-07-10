@@ -1,21 +1,21 @@
-import {defineStore} from 'pinia'
-import {reactive} from "vue";
+import { defineStore } from "pinia";
+import { reactive } from "vue";
 
-export const useErrorStore = defineStore('error', () => {
-    const errors = reactive({})
+export const useErrorStore = defineStore("error", () => {
+    const errors = reactive({});
 
     function clearErrors() {
-        Object.keys(errors).forEach(key => {
-            delete errors[key]
-        })
+        Object.keys(errors).forEach((key) => {
+            delete errors[key];
+        });
     }
 
     function showErrors(newErrors) {
-        clearErrors()
+        clearErrors();
         for (const [key, message] of Object.entries(newErrors)) {
-            errors[key] = message[0]
+            errors[key] = message[0];
         }
     }
 
-    return { errors, clearErrors, showErrors }
-})
+    return { errors, clearErrors, showErrors };
+});
