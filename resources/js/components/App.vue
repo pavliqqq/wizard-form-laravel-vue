@@ -2,24 +2,20 @@
     <div id="app">
         <Map v-if="showMap"></Map>
         <div class="mt-3 mr-3 text-right">
-            <LogoutButton v-if="adminStore.isAdmin" />
+            <LogoutButton v-if="adminStore.isAdmin"/>
         </div>
-        <router-view />
+        <router-view/>
     </div>
 </template>
 
 <script setup>
-import { computed, onMounted } from "vue";
+import {computed} from "vue";
 import LogoutButton from "./Admin/LogoutButton.vue";
 import Map from "./Map/Map.vue";
-import { useRoute } from "vue-router";
-import { useAdminStore } from "../stores/adminStore.js";
+import {useRoute} from "vue-router";
+import {useAdminStore} from "../stores/adminStore.js";
 
 const adminStore = useAdminStore();
-
-onMounted(() => {
-    adminStore.isAdmin = !!localStorage.getItem("token");
-});
 
 const route = useRoute();
 
