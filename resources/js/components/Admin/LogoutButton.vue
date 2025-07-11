@@ -10,18 +10,20 @@
 
 <script setup>
 import router from "../../router.js";
+import {useAdminStore} from "../../stores/adminStore.js";
 
+const adminStore = useAdminStore()
 async function logout() {
     try {
-        await axios.post("/api/admin/logout", null, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-        });
+        await axios.get('/sanctum/csrf-cookie');
+
+        await axios.post("/api/logout", null);
+
+        adminStore.reset();
+
+        router.go(0);
     } catch (e) {
         console.error("Logout failed:", e);
     }
-    localStorage.removeItem("token");
-    router.go(0);
 }
 </script>
