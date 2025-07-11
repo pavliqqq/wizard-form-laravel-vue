@@ -7,7 +7,7 @@
                 <BaseInput
                     name="email"
                     placeholder="email"
-                    v-model="formData.email"
+                    v-model="Data.email"
                     :errors="errors"
                 />
             </div>
@@ -17,7 +17,7 @@
                     name="password"
                     type="password"
                     placeholder="password"
-                    v-model="formData.password"
+                    v-model="Data.password"
                     :errors="errors"
                 />
             </div>
@@ -44,9 +44,9 @@ import {useAdminStore} from "../../stores/adminStore.js";
 const errorStore = useErrorStore();
 const errors = errorStore.errors;
 
-const adminStore = useAdminStore();
+const adminStore = useAdminStore()
 
-const formData = ref({
+const Data = ref({
     email: "",
     password: "",
 });
@@ -54,10 +54,11 @@ const formData = ref({
 async function login() {
     try {
         await axios.get('/sanctum/csrf-cookie');
-        const res = await axios.post("/api/admin/login", formData.value);
 
-        localStorage.setItem("token", res.data.token);
-        adminStore.isAdmin = true;
+        await axios.post("/api/login", Data.value);
+
+        await adminStore.checkUser()
+
         await router.push({name: "all.members"});
     } catch (error) {
         if (error.response && error.response.status === 422) {

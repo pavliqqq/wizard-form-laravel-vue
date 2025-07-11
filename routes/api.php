@@ -1,8 +1,12 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\CountryController;
 use App\Http\Controllers\API\MemberController;
+use App\Http\Controllers\API\UserController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/countries', [CountryController::class, 'index']);
 
 Route::prefix('members')->group(function () {
     Route::post('/', [MemberController::class, 'store']);
@@ -11,13 +15,17 @@ Route::prefix('members')->group(function () {
     Route::get('/share', [MemberController::class, 'sharePage']);
 });
 
-Route::prefix('admin')->group(function () {
+Route::middleware('web')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
 
-        Route::post('/toggle/{member}', [MemberController::class, 'toggleVisibility']);
-        Route::delete('/{member}', [MemberController::class, 'destroy']);
+        Route::get('/me', [UserController::class, 'me']);
+
+        Route::prefix('members')->group(function () {
+            Route::post('/toggle/{member}', [MemberController::class, 'toggleVisibility']);
+            Route::delete('/{member}', [MemberController::class, 'destroy']);
+        });
     });
 });
