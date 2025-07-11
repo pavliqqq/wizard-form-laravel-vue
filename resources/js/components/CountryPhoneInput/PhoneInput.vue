@@ -1,5 +1,4 @@
 <template>
-    <div class="flex flex-col">
         <VueTelInput
             v-model="phone"
             v-bind="phoneOptions"
@@ -13,13 +12,12 @@
         >
             {{ error || "Invalid phone number." }}
         </div>
-    </div>
 </template>
 
 <script setup>
-import { VueTelInput } from "vue-tel-input";
+import {VueTelInput} from "vue-tel-input";
 import "vue-tel-input/vue-tel-input.css";
-import { computed, ref, watch } from "vue";
+import {computed, ref, watch} from "vue";
 
 const props = defineProps({
     phone: String,
@@ -53,26 +51,36 @@ function onBlur() {
 }
 
 const phoneOptions = {
-    validCharactersOnly: true,
-    mode: "international",
-    dropdownOptions: {
-        showSearchBox: true,
-        searchBoxPlaceholder: "United States",
-        showFlags: true,
-        showDialCodeInSelection: true,
-    },
+        validCharactersOnly: true,
+        mode: "international",
+        dropdownOptions:
+            {
+                showSearchBox: true,
+                searchBoxPlaceholder:
+                    "United States",
+                showFlags:
+                    true,
+                showDialCodeInSelection:
+                    true,
+            }
+        ,
 
-    inputOptions: {
-        required: true,
-        showDialCode: true,
-        maxlength: 20,
-        name: "phone",
-        styleClasses: "border p-2 rounded w-full",
-        placeholder: "Phone number",
-    },
-};
+        inputOptions: {
+            required: true,
+            showDialCode:
+                true,
+            maxlength:
+                20,
+            name:
+                "phone",
+            styleClasses:
+                "border p-2 rounded w-full",
+            placeholder:
+                "Phone number",
+        }
+        ,
+    }
+;
 
-const error = computed(
-    () => props.errors[phoneOptions.inputOptions.name] ?? null,
-);
+const error = computed(() => props.errors[phoneOptions.inputOptions.name] ?? null);
 </script>
