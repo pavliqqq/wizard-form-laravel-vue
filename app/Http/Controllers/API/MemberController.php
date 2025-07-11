@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Requests\Form\StoreMemberRequest;
-use App\Http\Requests\Form\UpdateMemberRequest;
+use App\Http\Requests\Member\StoreMemberRequest;
+use App\Http\Requests\Member\UpdateMemberRequest;
 use App\Models\Member;
 use App\Services\FileService;
 use Spatie\QueryBuilder\QueryBuilder;
