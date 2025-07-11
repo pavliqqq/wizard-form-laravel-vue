@@ -22,13 +22,21 @@
                 />
             </div>
             <div class="flex flex-col">
-                <BirthdateInput v-model="Data.birthdate" :errors="errors" />
+                <BirthdateInput v-model="Data.birthdate" :errors="errors"/>
             </div>
             <div class="flex flex-col">
                 <BaseInput
                     name="report_subject"
                     placeholder="Report Subject"
                     v-model="Data.reportSubject"
+                    :errors="errors"
+                />
+            </div>
+            <div class="flex flex-col">
+                <BaseSelect
+                    name="country"
+                    v-model="Data.country"
+                    :items="countries"
                     :errors="errors"
                 />
             </div>
@@ -62,13 +70,14 @@
 </template>
 
 <script setup>
-import PhoneInput from "../CountryPhoneInput/CountryPhoneInput.vue";
+import PhoneInput from "../CountryPhoneInput/PhoneInput.vue";
 import BaseInput from "../UI/Form/BaseInput.vue";
 import BirthdateInput from "../UI/Form/BirthdateInput.vue";
-import { ref, onMounted } from "vue";
-import { camelToSnakeObj } from "../../helpers/caseConverter.js";
-import { useErrorStore } from "../../stores/errorStore.js";
-import { createFormData } from "../../helpers/request.js";
+import {ref, onMounted} from "vue";
+import {camelToSnakeObj} from "../../helpers/caseConverter.js";
+import {useErrorStore} from "../../stores/errorStore.js";
+import {createFormData} from "../../helpers/request.js";
+import BaseSelect from "../UI/Form/BaseSelect.vue";
 
 const errorStore = useErrorStore();
 const errors = errorStore.errors;
@@ -88,6 +97,7 @@ const Data = ref({
 const renderKey = ref(0);
 const memberId = ref(null);
 const originalEmail = ref(null);
+const countries = ref([])
 
 onMounted(() => {
     errorStore.clearErrors();
@@ -101,8 +111,24 @@ onMounted(() => {
     originalEmail.value = localStorage.getItem("email");
     memberId.value = localStorage.getItem("id");
 
+    getCountries();
+
     renderKey.value++;
 });
+
+async function getCountries() {
+    try {
+        const res = await axios.get('api/countries');
+
+        countries.value = res.data.map(country => ({
+            name: country.name,
+            value: country.code,
+        }));
+
+    } catch (e) {
+        console.error("Failed to load countries", e);
+    }
+}
 
 function action() {
     if (originalEmail.value === Data.value.email) {
