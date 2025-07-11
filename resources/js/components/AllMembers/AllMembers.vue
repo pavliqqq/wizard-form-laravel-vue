@@ -23,7 +23,7 @@
                         <MemberRow
                             v-else
                             :member="member"
-                            :isAdmin="isAdmin"
+                            :isAdmin="adminStore.isAdmin"
                             @edit="changeMember"
                             @delete="deleteMember"
                             @toggle="toggleVisibility"
@@ -63,12 +63,12 @@ const errorStore = useErrorStore();
 const errors = errorStore.errors;
 
 const adminStore = useAdminStore();
-const isAdmin = adminStore.isAdmin;
+
 
 const tableHeaders = computed(() => {
     const baseHeaders = ["Photo", "Full Name", "Report Subject", "Email"];
 
-    if (isAdmin) {
+    if (adminStore.isAdmin) {
         return [...baseHeaders, "Edit", "Delete", "Visible"];
     }
 
@@ -105,17 +105,11 @@ function cancelEditMember() {
     editPhotoPreview.value = null;
 }
 
-const authHeader = {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-};
-
 async function getMembers() {
     try {
         let res;
-        if (isAdmin) {
-            res = await axios.get("/api/members", {
-                headers: authHeader,
-            });
+        if (adminStore.isAdmin) {
+            res = await axios.get("/api/members")
         } else {
             res = await axios.get("/api/members?filter[visibility]=true");
         }
@@ -142,7 +136,6 @@ async function updateMember(id) {
         await axios.post(`api/members/${id}`, formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
-                authHeader,
             },
         });
         editMemberId.value = null;
@@ -158,12 +151,10 @@ async function updateMember(id) {
 
 async function toggleVisibility(member) {
     try {
+        await axios.get('/sanctum/csrf-cookie');
         const res = await axios.post(
-            `api/admin/members/toggle/${member.id}`,
+            `api/members/toggle/${member.id}`,
             null,
-            {
-                headers: authHeader,
-            },
         );
         member.visibility = res.data.visible;
     } catch (error) {
@@ -173,9 +164,9 @@ async function toggleVisibility(member) {
 
 async function deleteMember(id) {
     try {
-        await axios.delete(`api/admin/members/${id}`, {
-            headers: authHeader,
-        });
+        await axios.get('/sanctum/csrf-cookie');
+
+        await axios.delete(`api/members/${id}`);
         await getMembers();
     } catch (e) {
         console.error("Failed to delete member", e);
