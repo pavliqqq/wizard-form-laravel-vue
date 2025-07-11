@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Requests\Admin\AuthRequest;
+use App\Http\Requests\User\AuthRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 
 class AuthController
 {
@@ -13,21 +12,18 @@ class AuthController
     {
         $data = $request->validated();
 
-        if (Auth::guard('admin')->attempt($data)) {
+        if (Auth::attempt($data)) {
             $request->session()->regenerate();
 
-            return redirect()->intended();
+            return response()->json(['success' => true]);
         }
 
-        return back()->withErrors([
-            'email' => 'Incorrect credentials.',
-        ])->onlyInput('email');
+        return response()->json(['errors' =>
+            ['email' => ['The provided credentials do not match our records..'],]], 422);
     }
 
     public function logout(Request $request)
     {
-        Auth::logout();
-
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
