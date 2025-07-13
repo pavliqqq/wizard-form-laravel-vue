@@ -1,5 +1,5 @@
-import { defineStore } from "pinia";
-import { ref} from "vue";
+import {defineStore} from "pinia";
+import {ref} from "vue";
 
 export const useAdminStore = defineStore("admin", () => {
     const isAdmin = ref();
@@ -16,9 +16,14 @@ export const useAdminStore = defineStore("admin", () => {
         }
     }
 
-    function reset(){
+    function reset() {
         isAdmin.value = false
     }
 
-    return { isAdmin, checkUser, reset };
+    return {isAdmin, checkUser, reset};
+}, {
+    persist: {
+        storage: sessionStorage,
+        paths: ['isAdmin'],
+    }
 });
