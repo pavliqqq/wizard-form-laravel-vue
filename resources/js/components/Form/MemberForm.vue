@@ -5,9 +5,9 @@
 </template>
 
 <script setup>
-import FirstStep from "./FirstStep.vue";
-import SecondStep from "./SecondStep.vue";
-import ThirdStep from "./ThirdStep.vue";
+import FirstStep from "./Pages/FirstStep.vue";
+import SecondStep from "./Pages/SecondStep.vue";
+import ThirdStep from "./Pages/ThirdStep.vue";
 import { computed, onMounted, ref, watch } from "vue";
 
 const currentStep = computed(() => steps[currentIndex.value]);
