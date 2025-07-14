@@ -36,14 +36,14 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from "vue";
-import MemberRow from "../MemberRow.vue";
-import MemberRowEdit from "../MemberRowEdit.vue";
+import {computed, onMounted, ref, watch} from "vue";
+import MemberRow from "../UI/Form/MemberRow.vue";
+import MemberRowEdit from "../UI/Form/MemberRowEdit.vue";
 import BaseTable from "../UI/Form/BaseTable.vue";
-import { useErrorStore } from "../../stores/errorStore.js";
-import { createFormData } from "../../helpers/request.js";
-import { useAdminStore } from "../../stores/adminStore.js";
-import { splitter } from "../../helpers/fullNameSplitter.js";
+import {useErrorStore} from "../../stores/errorStore.js";
+import {createFormData} from "../../helpers/request.js";
+import {useAdminStore} from "../../stores/adminStore.js";
+import {splitter} from "../../helpers/fullNameSplitter.js";
 
 const members = ref([]);
 
@@ -52,10 +52,7 @@ const editPhoto = ref(null);
 const editPhotoPreview = ref(null);
 
 watch(editPhoto, (file) => {
-    if (editPhotoPreview.value) {
-        URL.revokeObjectURL(editPhotoPreview.value);
-    }
-
+    if (editPhotoPreview.value) URL.revokeObjectURL(editPhotoPreview.value);
     editPhotoPreview.value = file ? URL.createObjectURL(file) : null;
 });
 
@@ -85,6 +82,11 @@ const editForm = ref({
     email: "",
 });
 
+function resetPhoto() {
+    editPhoto.value = null;
+    editPhotoPreview.value = null;
+}
+
 function changeMember(member) {
     editMemberId.value = member.id;
     editForm.value = {
@@ -92,17 +94,15 @@ function changeMember(member) {
         reportSubject: member.report_subject,
         email: member.email,
     };
-    editPhoto.value = null;
-    editPhotoPreview.value = null;
+    resetPhoto();
 
     errorStore.clearErrors();
 }
 
 function cancelEditMember() {
     editMemberId.value = null;
-    editForm.value = { fullName: "", reportSubject: "", email: "" };
-    editPhoto.value = null;
-    editPhotoPreview.value = null;
+    editForm.value = {fullName: "", reportSubject: "", email: ""};
+    resetPhoto();
 }
 
 async function getMembers() {
@@ -119,9 +119,9 @@ async function getMembers() {
     }
 }
 
-const { firstName, lastName } = splitter(editForm.value.fullName);
-
 async function updateMember(id) {
+    const {firstName, lastName} = splitter(editForm.value.fullName);
+
     const Data = {
         firstName: firstName,
         lastName: lastName,
@@ -131,16 +131,16 @@ async function updateMember(id) {
     };
 
     const formData = createFormData(Data);
+    formData.append("_method", "patch");
 
     try {
-        await axios.post(`api/members/${id}`, formData, {
+        await axios.post(`api/admin/members/${id}`, formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
             },
         });
         editMemberId.value = null;
-        editPhoto.value = null;
-        editPhotoPreview.value = null;
+        resetPhoto();
         await getMembers();
     } catch (error) {
         if (error.response && error.response.status === 422) {
@@ -151,11 +151,7 @@ async function updateMember(id) {
 
 async function toggleVisibility(member) {
     try {
-        await axios.get('/sanctum/csrf-cookie');
-        const res = await axios.post(
-            `api/members/toggle/${member.id}`,
-            null,
-        );
+        const res = await axios.post(`api/admin/members/toggle/${member.id}`, null);
         member.visibility = res.data.visible;
     } catch (error) {
         console.error("Failed to toggle visibility:", error);
@@ -164,9 +160,7 @@ async function toggleVisibility(member) {
 
 async function deleteMember(id) {
     try {
-        await axios.get('/sanctum/csrf-cookie');
-
-        await axios.delete(`api/members/${id}`);
+        await axios.delete(`api/admin/members/${id}`);
         await getMembers();
     } catch (e) {
         console.error("Failed to delete member", e);
