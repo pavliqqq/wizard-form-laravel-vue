@@ -85,13 +85,31 @@ cd path\to\your\project
 mysql -u root -p wizardForm < database/dump.sql
 ```
 
-### 6. Create the storage symbolic link
+### 6. Make migrations
+
+```bash
+php artisan migrate:fresh
+```
+
+### 7. Seed the database
+
+```bash
+php artisan db:seed
+```
+
+### 8. Create the storage symbolic link
 
 ```bash
 php artisan storage:link
 ```
 
-### 7. Start Local Server
+### 9. Copy default-image
+
+```bash
+php artisan app:default-image
+```
+
+### 10. Start Local Server
 
 ```bash
 php artisan serve
