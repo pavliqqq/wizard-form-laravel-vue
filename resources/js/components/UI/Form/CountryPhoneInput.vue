@@ -16,9 +16,9 @@
 </template>
 
 <script setup>
-import {VueTelInput} from "vue-tel-input";
+import { VueTelInput } from "vue-tel-input";
 import "vue-tel-input/vue-tel-input.css";
-import {computed, ref, watch} from "vue";
+import { computed, ref, watch } from "vue";
 
 const props = defineProps({
     name: String,
@@ -70,10 +70,12 @@ const phoneOptions = computed(() => ({
         name: props.name,
         styleClasses: "border p-2 rounded w-full",
         placeholder: "Phone number",
-    }
+    },
 }));
 
-const ready = computed(() => Array.isArray(props.items) && props.items.length > 0);
+const ready = computed(
+    () => Array.isArray(props.items) && props.items.length > 0,
+);
 
 const error = computed(() => props.errors[props.name] ?? null);
 </script>

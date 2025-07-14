@@ -21,7 +21,7 @@ class FileService
 
     public static function defaultImageCopy(): void
     {
-        if (!Storage::disk('public')->exists(self::DEFAULT_PHOTO)) {
+        if (! Storage::disk('public')->exists(self::DEFAULT_PHOTO)) {
             $source = public_path(self::DEFAULT_PHOTO);
             $target = Storage::disk('public')->path(self::DEFAULT_PHOTO);
 

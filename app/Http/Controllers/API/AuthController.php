@@ -18,8 +18,7 @@ class AuthController
             return response()->json(['success' => true]);
         }
 
-        return response()->json(['errors' =>
-            ['email' => ['The provided credentials do not match our records.'],]], 422);
+        return response()->json(['errors' => ['email' => ['The provided credentials do not match our records.']]], 422);
     }
 
     public function logout(Request $request)

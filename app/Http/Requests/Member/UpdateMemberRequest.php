@@ -27,7 +27,7 @@ class UpdateMemberRequest extends FormRequest
             'birthdate' => 'sometimes | required | date | before: -16 years',
             'report_subject' => 'sometimes | required | min:2 | max:500',
             'country' => ['sometimes', 'required', 'exists:countries,code'],
-            'phone' => ['sometimes', 'required', 'phone:' . $this->input('country')],
+            'phone' => ['sometimes', 'required', 'phone:'.$this->input('country')],
             'email' => ['sometimes', 'required', Rule::unique('members')->ignore($member->id, 'id'), 'email:rfc,dns'],
             'company' => 'nullable | string | min: 2 | max: 100',
             'position' => 'nullable | string | min: 2 | max: 100',

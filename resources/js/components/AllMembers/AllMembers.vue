@@ -36,14 +36,14 @@
 </template>
 
 <script setup>
-import {computed, onMounted, ref, watch} from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import MemberRow from "../UI/Form/MemberRow.vue";
 import MemberRowEdit from "../UI/Form/MemberRowEdit.vue";
 import BaseTable from "../UI/Form/BaseTable.vue";
-import {useErrorStore} from "../../stores/errorStore.js";
-import {createFormData} from "../../helpers/request.js";
-import {useAdminStore} from "../../stores/adminStore.js";
-import {splitter} from "../../helpers/fullNameSplitter.js";
+import { useErrorStore } from "../../stores/errorStore.js";
+import { createFormData } from "../../helpers/request.js";
+import { useAdminStore } from "../../stores/adminStore.js";
+import { splitter } from "../../helpers/fullNameSplitter.js";
 
 const members = ref([]);
 
@@ -60,7 +60,6 @@ const errorStore = useErrorStore();
 const errors = errorStore.errors;
 
 const adminStore = useAdminStore();
-
 
 const tableHeaders = computed(() => {
     const baseHeaders = ["Photo", "Full Name", "Report Subject", "Email"];
@@ -101,7 +100,7 @@ function changeMember(member) {
 
 function cancelEditMember() {
     editMemberId.value = null;
-    editForm.value = {fullName: "", reportSubject: "", email: ""};
+    editForm.value = { fullName: "", reportSubject: "", email: "" };
     resetPhoto();
 }
 
@@ -109,7 +108,7 @@ async function getMembers() {
     try {
         let res;
         if (adminStore.isAdmin) {
-            res = await axios.get("/api/members")
+            res = await axios.get("/api/members");
         } else {
             res = await axios.get("/api/members?filter[visibility]=true");
         }
@@ -120,7 +119,7 @@ async function getMembers() {
 }
 
 async function updateMember(id) {
-    const {firstName, lastName} = splitter(editForm.value.fullName);
+    const { firstName, lastName } = splitter(editForm.value.fullName);
 
     const Data = {
         firstName: firstName,
@@ -151,7 +150,10 @@ async function updateMember(id) {
 
 async function toggleVisibility(member) {
     try {
-        const res = await axios.post(`api/admin/members/toggle/${member.id}`, null);
+        const res = await axios.post(
+            `api/admin/members/toggle/${member.id}`,
+            null,
+        );
         member.visibility = res.data.visible;
     } catch (error) {
         console.error("Failed to toggle visibility:", error);

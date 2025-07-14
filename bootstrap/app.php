@@ -18,7 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->redirectUsersTo(function (Request $request) {
             if ($request->expectsJson()) {
-                throw new AlreadyAuthenticatedException();
+                throw new AlreadyAuthenticatedException;
             }
 
             return '/';

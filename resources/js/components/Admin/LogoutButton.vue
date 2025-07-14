@@ -10,12 +10,12 @@
 
 <script setup>
 import router from "../../router.js";
-import {useAdminStore} from "../../stores/adminStore.js";
+import { useAdminStore } from "../../stores/adminStore.js";
 
-const adminStore = useAdminStore()
+const adminStore = useAdminStore();
 async function logout() {
     try {
-        await axios.get('/sanctum/csrf-cookie');
+        await axios.get("/sanctum/csrf-cookie");
 
         await axios.post("/api/logout", null);
 

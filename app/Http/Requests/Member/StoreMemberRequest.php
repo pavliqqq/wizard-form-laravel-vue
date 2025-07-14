@@ -25,7 +25,7 @@ class StoreMemberRequest extends FormRequest
             'birthdate' => 'required | date | before: -16 years',
             'report_subject' => 'required | min:2 | max:500',
             'country' => ['required', 'exists:countries,code'],
-            'phone' => ['required', 'phone:' . $this->input('country')],
+            'phone' => ['required', 'phone:'.$this->input('country')],
             'email' => ['required', Rule::unique('members'), 'email:rfc,dns'],
             'company' => 'nullable | string | min: 2 | max: 100',
             'position' => 'nullable | string | min: 2 | max: 100',
