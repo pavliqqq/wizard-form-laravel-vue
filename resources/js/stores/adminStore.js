@@ -10,7 +10,6 @@ export const useAdminStore = defineStore("admin", () => {
 
             const res = await axios.get('/api/me')
             isAdmin.value = (res.data.role === 'admin')
-            console.log(isAdmin.value)
         } catch (e) {
             console.error("Failed to load user info", e);
         }
