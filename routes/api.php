@@ -16,16 +16,19 @@ Route::prefix('members')->group(function () {
 });
 
 Route::middleware('web')->group(function () {
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
 
         Route::get('/me', [UserController::class, 'me']);
 
-        Route::prefix('members')->group(function () {
-            Route::post('/toggle/{member}', [MemberController::class, 'toggleVisibility']);
-            Route::delete('/{member}', [MemberController::class, 'destroy']);
+        Route::prefix('admin')->group(function () {
+            Route::prefix('members')->group(function () {
+                Route::patch('/{member}', [MemberController::class, 'update']);
+                Route::post('/toggle/{member}', [MemberController::class, 'toggleVisibility']);
+                Route::delete('/{member}', [MemberController::class, 'destroy']);
+            });
         });
     });
 });
