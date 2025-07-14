@@ -27,7 +27,7 @@ class CopyDefaultImage extends Command
     public function handle(): int
     {
         FileService::defaultImageCopy();
-        $this->info('Default image copied successfully or already exists.');
+        $this->info('Default image copied successfully.');
 
         return self::SUCCESS;
     }
