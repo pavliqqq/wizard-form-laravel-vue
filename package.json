@@ -28,6 +28,7 @@
         "inputmask": "^5.0.9",
         "leaflet": "^1.9.4",
         "pinia": "^3.0.3",
+        "pinia-plugin-persistedstate": "^4.4.1",
         "vue-router": "^4.5.1",
         "vue-tel-input": "^9.3.0"
     }
