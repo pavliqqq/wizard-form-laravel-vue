@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\Member;
 
-use App\Rules\CountryCheck;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -25,8 +24,8 @@ class StoreMemberRequest extends FormRequest
             'last_name' => 'required | string | min:2 | max:50',
             'birthdate' => 'required | date | before: -16 years',
             'report_subject' => 'required | min:2 | max:500',
-            'country' => ['required', new CountryCheck],
-            'phone' => 'required | string | min:10 | max: 20',
+            'country' => ['required', 'exists:countries,code'],
+            'phone' => ['required', 'phone:' . $this->input('country')],
             'email' => ['required', Rule::unique('members'), 'email:rfc,dns'],
             'company' => 'nullable | string | min: 2 | max: 100',
             'position' => 'nullable | string | min: 2 | max: 100',
@@ -40,6 +39,7 @@ class StoreMemberRequest extends FormRequest
     {
         return [
             'birthdate.before' => 'You must be at least 16 years old.',
+            'phone.phone' => 'The phone number is not valid for the selected country.',
         ];
     }
 }
