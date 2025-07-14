@@ -24,14 +24,14 @@ class MemberController
 
     public function update(UpdateMemberRequest $request, Member $member)
     {
-        $photoPath = FileService::photoService($request);
+        $photoPath = FileService::photoService($request, $member);
 
         $data = $request->validated();
 
         $data['photo'] = $photoPath;
 
         $member->update($data);
-        $count = Member::count();
+        $count = Member::where('visibility', true)->count();
 
         return response()->json(['success' => true, 'count' => $count]);
     }
@@ -49,7 +49,7 @@ class MemberController
             $result[] = [
                 'id' => $member['id'],
                 'photo' => $member['photo'],
-                'full_name' => $member['first_name'].' '.$member['last_name'],
+                'full_name' => $member['first_name'] . ' ' . $member['last_name'],
                 'report_subject' => $member['report_subject'],
                 'email' => $member['email'],
                 'visibility' => $member['visibility'],
@@ -68,21 +68,18 @@ class MemberController
 
         $tweetText = $shareConfig['tweetText'];
 
-        $facebookUrl = 'https://www.facebook.com/sharer/sharer.php?u='.urlencode($shareUrl);
-        $twitterUrl = 'https://twitter.com/intent/tweet?text='.urlencode($tweetText).'&url='.urlencode($shareUrl);
+        $facebookUrl = 'https://www.facebook.com/sharer/sharer.php?u=' . urlencode($shareUrl);
+        $twitterUrl = 'https://twitter.com/intent/tweet?text=' . urlencode($tweetText) . '&url=' . urlencode($shareUrl);
 
         return response()->json(['success' => true, 'facebookUrl' => $facebookUrl, 'twitterUrl' => $twitterUrl]);
     }
 
     public function toggleVisibility(Member $member)
     {
-        $member->visibility = ! $member->visibility;
+        $member->visibility = !$member->visibility;
         $member->save();
 
-        return response()->json([
-            'success' => true,
-            'visible' => $member->visibility,
-        ]);
+        return response()->json(['success' => true, 'visible' => $member->visibility]);
     }
 
     public function destroy(Member $member)
