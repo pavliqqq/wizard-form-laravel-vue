@@ -19,7 +19,7 @@ class AuthController
         }
 
         return response()->json(['errors' =>
-            ['email' => ['The provided credentials do not match our records..'],]], 422);
+            ['email' => ['The provided credentials do not match our records.'],]], 422);
     }
 
     public function logout(Request $request)
@@ -28,6 +28,6 @@ class AuthController
 
         $request->session()->regenerateToken();
 
-        return response()->json(['message' => 'Logged out']);
+        return response()->json(['success' => true]);
     }
 }
