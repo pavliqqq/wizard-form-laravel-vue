@@ -12,7 +12,7 @@
         <td class="p-3 break-words max-w-[200px]">
             {{ member.report_subject }}
         </td>
-        <td class="p-3 break-all max-w-[200px]">
+        <td class="p-3 whitespace-nowrap">
             <a
                 :href="`https://mail.google.com/mail/?view=cm&fs=1&to=${member.email}`"
                 target="_blank"

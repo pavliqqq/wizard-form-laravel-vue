@@ -62,11 +62,11 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import BaseInput from "../UI/Form/BaseInput.vue";
-import BaseTextArea from "../UI/Form/BaseTextArea.vue";
-import FileInput from "../UI/Form/FileInput.vue";
-import { useErrorStore } from "../../stores/errorStore.js";
-import { createFormData } from "../../helpers/request.js";
+import BaseInput from "../../UI/Form/BaseInput.vue";
+import BaseTextArea from "../../UI/Form/BaseTextArea.vue";
+import FileInput from "../../UI/Form/FileInput.vue";
+import { useErrorStore } from "../../../stores/errorStore.js";
+import { createFormData } from "../../../helpers/request.js";
 
 const errorStore = useErrorStore();
 const errors = errorStore.errors;
@@ -92,10 +92,6 @@ onMounted(() => {
 });
 
 async function submit() {
-    if (Data.value.photo && errors.photo) {
-        return;
-    }
-
     localStorage.setItem("secondStep", JSON.stringify(Data.value));
 
     const formData = createFormData(Data.value);

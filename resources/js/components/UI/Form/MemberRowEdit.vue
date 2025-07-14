@@ -62,8 +62,8 @@
 </template>
 
 <script setup>
-import FileInput from "./UI/Form/FileInput.vue";
-import BaseInput from "./UI/Form/BaseInput.vue";
+import FileInput from "./FileInput.vue";
+import BaseInput from "./BaseInput.vue";
 
 const props = defineProps({
     member: Object,

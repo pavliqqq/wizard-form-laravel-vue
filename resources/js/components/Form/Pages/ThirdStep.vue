@@ -6,14 +6,14 @@
                 <a
                     :href="facebookUrl"
                     target="_blank"
-                    class="bg-blue-600 text-white px-4 py-2 rounded"
+                    class="bg-blue-600 hover:bg-blue-700 text-white text-center px-6 py-2 rounded w-full sm:w-auto transition-colors duration-200"
                 >
                     Share on Facebook
                 </a>
                 <a
                     :href="twitterUrl"
                     target="_blank"
-                    class="bg-blue-400 text-white px-4 py-2 rounded"
+                    class="bg-blue-400 hover:bg-blue-500 text-white text-center px-6 py-2 rounded w-full sm:w-auto transition-colors duration-200"
                 >
                     Share on Twitter
                 </a>
@@ -41,7 +41,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import router from "../../router.js";
+import router from "../../../router.js";
 
 const count = ref(null);
 const facebookUrl = ref(null);
