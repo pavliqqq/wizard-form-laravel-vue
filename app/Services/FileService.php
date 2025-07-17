@@ -8,22 +8,24 @@ use Illuminate\Support\Facades\Storage;
 
 class FileService
 {
-    public const DEFAULT_PHOTO = 'images/default.png';
-
-    public static function photoService(FormRequest $request, ?Member $member = null): string
+    public static function fileHandler(FormRequest $request, string $field, ?Member $member = null): string
     {
-        if ($request->hasFile('photo')) {
-            return $request->file('photo')->store('images', 'public');
+        $defaultFilePath = config('file.defaultImagePath');
+
+        if ($request->hasFile($field)) {
+            return $request->file($field)->store('images', 'public');
         }
 
-        return $member?->photo ?: self::DEFAULT_PHOTO;
+        return $member?->$field ?: $defaultFilePath;
     }
 
-    public static function defaultImageCopy(): void
+    public static function defaultFileCopy(): void
     {
-        if (! Storage::disk('public')->exists(self::DEFAULT_PHOTO)) {
-            $source = public_path(self::DEFAULT_PHOTO);
-            $target = Storage::disk('public')->path(self::DEFAULT_PHOTO);
+        $defaultFilePath = config('file.defaultImagePath');
+
+        if (! Storage::disk('public')->exists($defaultFilePath)) {
+            $source = public_path($defaultFilePath);
+            $target = Storage::disk('public')->path($defaultFilePath);
 
             Storage::disk('public')->makeDirectory('images');
             copy($source, $target);
