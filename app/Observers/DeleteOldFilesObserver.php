@@ -2,28 +2,41 @@
 
 namespace App\Observers;
 
-use App\Models\Member;
-use App\Services\FileService;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
 class DeleteOldFilesObserver
 {
-    public function updating(Member $member): void
-    {
-        $oldPhoto = $member->getOriginal('photo');
-        $newPhoto = $member->photo;
+    protected array $fileFields;
 
-        if ($oldPhoto && $oldPhoto !== FileService::DEFAULT_PHOTO && $oldPhoto !== $newPhoto) {
-            Storage::disk('public')->delete($oldPhoto);
+    protected string $defaultFilePath;
+
+    public function __construct(array $fileFields, string $defaultFilePath = '')
+    {
+        $this->fileFields = $fileFields;
+        $this->defaultFilePath = $defaultFilePath;
+    }
+
+    public function updated(Model $model): void
+    {
+        foreach ($this->fileFields as $field) {
+            $oldFile = $model->getOriginal($field);
+            $newFile = $model->$field;
+
+            if ($oldFile && $oldFile !== $newFile && $oldFile !== $this->defaultFilePath) {
+                Storage::disk('public')->delete($oldFile);
+            }
         }
     }
 
-    public function deleting(Member $member): void
+    public function deleted(Model $model): void
     {
-        $photo = $member->photo;
+        foreach ($this->fileFields as $field) {
+            $file = $model->$field;
 
-        if ($photo && $photo !== FileService::DEFAULT_PHOTO) {
-            Storage::disk('public')->delete($photo);
+            if ($file && $file !== $this->defaultFilePath) {
+                Storage::disk('public')->delete($file);
+            }
         }
     }
 }
