@@ -11,16 +11,15 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Register any application services.
      */
-    public function register(): void
+    public function register()
     {
-        //
+        $this->app->singleton(DeleteOldFilesObserver::class, function () {
+            return new DeleteOldFilesObserver(['photo'], config('file.defaultImagePath'));
+        });
     }
 
-    /**
-     * Bootstrap any application services.
-     */
-    public function boot(): void
+    public function boot()
     {
-        Member::observe(new DeleteOldFilesObserver(['photo'], config('file.defaultImagePath')));
+        Member::observe(app(DeleteOldFilesObserver::class));
     }
 }
