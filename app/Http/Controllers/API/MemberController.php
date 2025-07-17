@@ -12,7 +12,7 @@ class MemberController
 {
     public function store(StoreMemberRequest $request)
     {
-        $photoPath = FileService::photoService($request);
+        $photoPath = FileService::fileHandler($request, 'photo');
 
         $data = $request->validated();
         $data['photo'] = $photoPath;
@@ -24,7 +24,7 @@ class MemberController
 
     public function update(UpdateMemberRequest $request, Member $member)
     {
-        $photoPath = FileService::photoService($request, $member);
+        $photoPath = FileService::fileHandler($request, 'photo', $member);
 
         $data = $request->validated();
 
