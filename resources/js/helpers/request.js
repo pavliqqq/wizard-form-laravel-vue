@@ -19,7 +19,7 @@ function appendFormData(formData, value, key) {
             const newKey = `${key}[${index}]`;
             appendFormData(formData, item, newKey);
         });
-    } else if (typeof value === "object") {
+    } else if (typeof value === "object" && value !== null) {
         for (const [objKey, item] of Object.entries(value)) {
             const snakeKey = camelToSnake(objKey);
 
