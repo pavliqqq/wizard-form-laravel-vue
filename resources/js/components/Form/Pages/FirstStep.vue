@@ -113,7 +113,7 @@ async function getCountries() {
     try {
         const res = await axios.get("api/countries");
 
-        countries.value = res.data.map((item) => item.code);
+        countries.value = res.data.countries.map((item) => item.code);
     } catch (e) {
         console.error("Failed to load countries", e);
     }
