@@ -8,6 +8,6 @@ class CountryController
 {
     public function index()
     {
-        return Country::all();
+        return response()->json(['success' => true, 'countries' => Country::all()]);
     }
 }
