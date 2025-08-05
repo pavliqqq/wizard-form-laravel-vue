@@ -48,6 +48,7 @@
             <div class="flex flex-col">
                 <BaseInput
                     name="email"
+                    type="email"
                     placeholder="Email"
                     v-model="Data.email"
                     :errors="errors"
@@ -59,6 +60,7 @@
             <button
                 @click.prevent="action"
                 class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded transition-colors duration-200"
+                data-testid="nextButton"
             >
                 Next
             </button>
@@ -73,12 +75,17 @@ import BirthdateInput from "../../UI/Form/BirthdateInput.vue";
 import { ref, onMounted, computed } from "vue";
 import { camelToSnakeObj } from "../../../helpers/caseConverter.js";
 import { useErrorStore } from "../../../stores/errorStore.js";
-import { createFormData } from "../../../helpers/request.js";
+import axios from "axios";
 
 const errorStore = useErrorStore();
-const errors = errorStore.errors;
 
 const emit = defineEmits(["next"]);
+const props = defineProps({
+    update: Function,
+    errors: Object,
+});
+
+const errors = props.errors;
 
 const Data = ref({
     firstName: "",
@@ -96,8 +103,6 @@ const originalEmail = ref(null);
 const countries = ref([]);
 
 onMounted(() => {
-    errorStore.clearErrors();
-
     const saved = localStorage.getItem("firstStep");
     if (saved) {
         const parsed = JSON.parse(saved);
@@ -125,40 +130,47 @@ function action() {
     originalEmail.value = localStorage.getItem("email");
 
     if (originalEmail.value === Data.value.email) {
-        updateMember();
-    } else createMember();
+        updateMemberService.updateMember();
+    } else createMemberService.createMember();
 }
 
-async function createMember() {
-    localStorage.setItem("firstStep", JSON.stringify(Data.value));
+const createMemberService = {
+    async createMember() {
+        localStorage.setItem("firstStep", JSON.stringify(Data.value));
 
-    const value = camelToSnakeObj(Data.value);
-    try {
-        const res = await axios.post("/api/members", value);
+        const value = camelToSnakeObj(Data.value);
+        try {
+            const res = await axios.post("/api/members", value);
 
-        localStorage.setItem("id", res.data.id);
-        localStorage.setItem("email", res.data.email);
-        emit("next");
-    } catch (error) {
-        if (error.response && error.response.status === 422) {
-            errorStore.showErrors(error.response.data.errors);
+            localStorage.setItem("id", res.data.id);
+            localStorage.setItem("email", res.data.email);
+            emit("next");
+        } catch (error) {
+            if (error.response && error.response.status === 422) {
+                errorStore.showErrors(error.response.data.errors);
+            }
         }
-    }
-}
+    },
+};
 
-async function updateMember() {
-    memberId.value = localStorage.getItem("id");
+const updateMemberService = {
+    async updateMember() {
+        memberId.value = localStorage.getItem("id");
 
-    const formData = createFormData(Data.value);
-    formData.append("_method", "patch");
-
-    try {
-        await axios.post(`/api/members/${memberId.value}`, formData);
-        emit("next");
-    } catch (error) {
-        if (error.response && error.response.status === 422) {
-            errorStore.showErrors(error.response.data.errors);
+        const data = {
+            ...Data.value,
+            id: memberId.value,
+        };
+        try {
+            const res = await props.update(data);
+            if (res) {
+                emit("next");
+            }
+        } catch (e) {
+            console.error("Error submitting: ", e);
         }
-    }
-}
+    },
+};
+
+defineExpose({ createMemberService, updateMemberService });
 </script>
