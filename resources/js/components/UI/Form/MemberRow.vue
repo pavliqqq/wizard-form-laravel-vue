@@ -6,6 +6,7 @@
                 :src="`/storage/${member.photo}`"
                 :alt="member.full_name"
                 class="h-10 w-10 object-cover rounded-full"
+                data-testid="photo-img"
             />
         </td>
         <td class="p-3 break-words max-w-[200px]">{{ member.full_name }}</td>
@@ -17,6 +18,7 @@
                 :href="`https://mail.google.com/mail/?view=cm&fs=1&to=${member.email}`"
                 target="_blank"
                 class="text-blue-600 hover:underline"
+                data-testid="email-link"
             >
                 {{ member.email }}
             </a>
@@ -25,6 +27,7 @@
             <button
                 @click.prevent="$emit('edit', member)"
                 class="underline text-orange-600"
+                data-testid="edit-button"
             >
                 Edit
             </button>
@@ -33,6 +36,7 @@
             <button
                 @click="$emit('delete', member.id)"
                 class="underline text-red-600"
+                data-testid="delete-button"
             >
                 Delete
             </button>
@@ -42,6 +46,7 @@
                 @click="$emit('toggle', member)"
                 :class="member.visibility ? 'text-green-600' : 'text-gray-400'"
                 class="underline"
+                data-testid="toggleVisibility-button"
             >
                 {{ member.visibility ? "Visible" : "Hidden" }}
             </button>

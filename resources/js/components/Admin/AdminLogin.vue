@@ -29,6 +29,7 @@
                     <button
                         type="submit"
                         class="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded text-sm sm:text-base"
+                        data-testid="submitButton"
                     >
                         Login
                     </button>
@@ -44,6 +45,7 @@ import router from "../../router.js";
 import BaseInput from "../UI/Form/BaseInput.vue";
 import { useErrorStore } from "../../stores/errorStore.js";
 import { useAdminStore } from "../../stores/adminStore.js";
+import axios from "axios";
 
 const errorStore = useErrorStore();
 const errors = errorStore.errors;

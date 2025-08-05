@@ -1,12 +1,13 @@
 <template>
     <tr class="border-b bg-white hover:bg-gray-50 text-sm">
-        <th class="hidden">{{ member.id }}</th>
+        <th class="hidden">{{ memberId }}</th>
         <td class="p-3">
             <label class="block w-10 h-10 relative">
                 <img
-                    :src="photoPreview || `/storage/${member.photo}`"
+                    :src="photoPreview || `/storage/${memberPhoto}`"
                     alt="photo"
                     class="h-10 w-10 object-cover rounded-full"
+                    data-testid="photo-img"
                 />
                 <FileInput
                     name="photo"
@@ -14,7 +15,6 @@
                     :maxSizeKb="500"
                     :class="'absolute inset-0 opacity-0'"
                     @update:modelValue="emit('update:photo', $event)"
-                    :errors="errors"
                 />
             </label>
         </td>
@@ -45,7 +45,8 @@
         <td class="p-3 whitespace-nowrap">
             <button
                 class="inline-block bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm"
-                @click="$emit('update', member.id)"
+                @click="$emit('update', memberId)"
+                data-testid="updateButton"
             >
                 Update
             </button>
@@ -54,6 +55,7 @@
             <button
                 class="ml-2 text-sm text-gray-500 hover:underline"
                 @click="$emit('cancelEdit')"
+                data-testid="cancelButton"
             >
                 Cancel
             </button>
@@ -66,7 +68,8 @@ import FileInput from "./FileInput.vue";
 import BaseInput from "./BaseInput.vue";
 
 const props = defineProps({
-    member: Object,
+    memberId: Number,
+    memberPhoto: String,
     photo: null,
     photoPreview: null,
     fullName: String,
