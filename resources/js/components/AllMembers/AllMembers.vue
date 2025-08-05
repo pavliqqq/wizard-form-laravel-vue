@@ -10,7 +10,8 @@
                     <template v-for="member in members" :key="member.id">
                         <MemberRowEdit
                             v-if="isEdit(member.id)"
-                            :member="member"
+                            :memberId="member.id"
+                            :memberPhoto="member.photo"
                             :photoPreview="editPhotoPreview"
                             v-model:photo="editPhoto"
                             v-model:fullName="editForm.fullName"
@@ -44,6 +45,7 @@ import { useErrorStore } from "../../stores/errorStore.js";
 import { createFormData } from "../../helpers/request.js";
 import { useAdminStore } from "../../stores/adminStore.js";
 import { splitter } from "../../helpers/fullNameSplitter.js";
+import axios from "axios";
 
 const members = ref([]);
 
@@ -81,10 +83,12 @@ const editForm = ref({
     email: "",
 });
 
-function resetPhoto() {
-    editPhoto.value = null;
-    editPhotoPreview.value = null;
-}
+const photoService = {
+    resetPhoto() {
+        editPhoto.value = null;
+        editPhotoPreview.value = null;
+    },
+};
 
 function changeMember(member) {
     editMemberId.value = member.id;
@@ -93,7 +97,7 @@ function changeMember(member) {
         reportSubject: member.report_subject,
         email: member.email,
     };
-    resetPhoto();
+    photoService.resetPhoto();
 
     errorStore.clearErrors();
 }
@@ -101,22 +105,24 @@ function changeMember(member) {
 function cancelEditMember() {
     editMemberId.value = null;
     editForm.value = { fullName: "", reportSubject: "", email: "" };
-    resetPhoto();
+    photoService.resetPhoto();
 }
 
-async function getMembers() {
-    try {
-        let res;
-        if (adminStore.isAdmin) {
-            res = await axios.get("/api/members");
-        } else {
-            res = await axios.get("/api/members?filter[visibility]=true");
+const getMembersService = {
+    async getMembers() {
+        try {
+            let res;
+            if (adminStore.isAdmin) {
+                res = await axios.get("/api/members");
+            } else {
+                res = await axios.get("/api/members?filter[visibility]=true");
+            }
+            members.value = res.data.members;
+        } catch (e) {
+            console.error("Failed to load members", e);
         }
-        members.value = res.data.members;
-    } catch (e) {
-        console.error("Failed to load members", e);
-    }
-}
+    },
+};
 
 async function updateMember(id) {
     const { firstName, lastName } = splitter(editForm.value.fullName);
@@ -139,8 +145,8 @@ async function updateMember(id) {
             },
         });
         editMemberId.value = null;
-        resetPhoto();
-        await getMembers();
+        photoService.resetPhoto();
+        await getMembersService.getMembers();
     } catch (error) {
         if (error.response && error.response.status === 422) {
             errorStore.showErrors(error.response.data.errors);
@@ -163,13 +169,15 @@ async function toggleVisibility(member) {
 async function deleteMember(id) {
     try {
         await axios.delete(`api/admin/members/${id}`);
-        await getMembers();
+        await getMembersService.getMembers();
     } catch (e) {
         console.error("Failed to delete member", e);
     }
 }
 
 onMounted(() => {
-    getMembers();
+    getMembersService.getMembers();
 });
+
+defineExpose({ photoService, getMembersService });
 </script>
