@@ -25,7 +25,6 @@ const props = defineProps({
     phone: String,
     country: String,
     items: Array,
-    phoneValid: Boolean,
     errors: Object,
 });
 
