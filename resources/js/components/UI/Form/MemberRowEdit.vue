@@ -2,7 +2,7 @@
     <tr class="border-b bg-white hover:bg-gray-50 text-sm">
         <th class="hidden">{{ memberId }}</th>
         <td class="p-3">
-            <label class="block w-10 h-10 relative">
+            <label class="block w-10 relative">
                 <img
                     :src="photoPreview || `/storage/${memberPhoto}`"
                     alt="photo"
@@ -18,7 +18,7 @@
                 />
             </label>
         </td>
-        <td class="p-3 break-words max-w-[200px]">
+        <td class="p-3 break-words max-w-[180px]">
             <BaseInput
                 name="full_name"
                 :modelValue="fullName"
@@ -26,7 +26,7 @@
                 :errors="errors"
             />
         </td>
-        <td class="p-3 break-words max-w-[200px]">
+        <td class="p-3 break-words max-w-[180px]">
             <BaseInput
                 name="report_subject"
                 :modelValue="reportSubject"
