@@ -10,7 +10,11 @@
             'border p-2 rounded w-full outline-none focus-within:border-gray-800 focus:border-gray-800'
         "
     />
-    <div v-if="error" class="text-red-600 text-sm mt-1">
+    <div
+        v-if="error"
+        class="text-red-600 text-sm mt-1 truncate"
+        :title="`${error}`"
+        :data-testid="`${name}-error`">
         {{ error }}
     </div>
 </template>
@@ -39,17 +43,6 @@ function fileChange(event) {
 
     if (!file) return;
 
-    const maxSizeBytes = props.maxSizeKb * 1024;
-
-    if (file.size > maxSizeBytes) {
-        errorStore.showErrors({
-            [props.name]: [`File must be less than ${props.maxSizeKb}Kb`],
-        });
-        fileInput.value.value = "";
-        return;
-    }
-
-    errorStore.clearErrors();
     emit("update:modelValue", file);
 }
 
