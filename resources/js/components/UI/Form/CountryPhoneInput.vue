@@ -10,6 +10,7 @@
     <div
         v-if="(!phoneValid && touched) || error"
         class="error-message text-red-600 text-sm mt-1"
+        :data-testid="`${name}-error`"
     >
         {{ error || "Invalid phone number." }}
     </div>
