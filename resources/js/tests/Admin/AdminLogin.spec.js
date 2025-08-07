@@ -1,4 +1,4 @@
-import { flushPromises, mount } from "@vue/test-utils";
+import { mount } from "@vue/test-utils";
 import router from "../../router.js";
 import AdminLogin from "../../components/Admin/AdminLogin.vue";
 import BaseInput from "../../components/UI/Form/BaseInput.vue";
@@ -34,6 +34,11 @@ jest.mock("../../stores/adminStore.js", () => ({
 
 describe("AdminLogin.vue", () => {
     let wrapper;
+
+    const defaultGlobal = {
+        stubs: { BaseInput: true },
+    };
+
     beforeEach(() => {
         setActivePinia(createPinia());
 
@@ -44,15 +49,8 @@ describe("AdminLogin.vue", () => {
         });
     });
 
-    const defaultGlobal = {
-        stubs: { BaseInput: true },
-    };
-
     it("renders login form", () => {
         const baseInputs = wrapper.findAllComponents(BaseInput);
-        baseInputs.forEach((input) => {
-            expect(input.exists()).toBe(true);
-        });
 
         const expectedNames = ["email", "password"];
 
@@ -66,7 +64,7 @@ describe("AdminLogin.vue", () => {
         expect(submitButton.exists()).toBe(true);
     });
 
-    it("logs in admin", async () => {
+    it("logs in admin account", async () => {
         const value = {
             email: "admin@example.com",
             password: "12345678",
@@ -74,7 +72,6 @@ describe("AdminLogin.vue", () => {
         wrapper.vm.Data = value;
 
         await wrapper.vm.login();
-        await flushPromises();
 
         expect(axios.get).toHaveBeenCalledWith("/sanctum/csrf-cookie");
         expect(axios.post).toHaveBeenCalledWith("/api/login", value);
@@ -83,11 +80,17 @@ describe("AdminLogin.vue", () => {
         expect(router.push).toHaveBeenCalledWith(routePush);
     });
 
-    // it('error while logs in', async () => {
-    //     const error = {
-    //         response: {
-    //             status:
-    //         }
-    //     }
-    // })
+    it('shows errors if login fails', async () => {
+        const errors = {
+            email: ["Email is required"],
+        };
+
+        axios.post.mockRejectedValueOnce({
+            response: { status: 422, data: { errors } },
+        });
+
+        await wrapper.vm.login();
+
+        expect(mockShowErrors).toHaveBeenCalledWith(errors);
+    })
 });
