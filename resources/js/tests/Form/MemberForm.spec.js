@@ -29,14 +29,16 @@ describe("MemberForm.vue", () => {
         },
     };
 
+    let wrapper;
     beforeEach(() => {
         setActivePinia(createPinia());
         jest.clearAllMocks();
         localStorage.clear();
+
+        wrapper = mount(MemberForm, { global: defaultGlobal });
     });
 
     it("renders FirstStep by default", () => {
-        const wrapper = mount(MemberForm, { global: defaultGlobal });
         expect(wrapper.findComponent(FirstStep).exists()).toBe(true);
     });
 
@@ -57,7 +59,6 @@ describe("MemberForm.vue", () => {
     });
 
     it("goes to next step on next event", async () => {
-        const wrapper = mount(MemberForm, { global: defaultGlobal });
         for (let index = 0; index < steps.length - 1; index++) {
             expect(wrapper.vm.currentIndex).toBe(index);
             await wrapper.findComponent(steps[index]).vm.$emit("next");
@@ -84,8 +85,6 @@ describe("MemberForm.vue", () => {
     });
 
     it("updates member", async () => {
-        const wrapper = mount(MemberForm, { global: defaultGlobal });
-
         const mockAppend = jest.fn();
         const fakeForm = { append: mockAppend };
         jest.spyOn(requestHelpers, "createFormData").mockReturnValue(fakeForm);

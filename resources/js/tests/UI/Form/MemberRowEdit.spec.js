@@ -1,4 +1,4 @@
-import { mount } from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import MemberRowEdit from "../../../components/UI/Form/MemberRowEdit.vue";
 import BaseInput from "../../../components/UI/Form/BaseInput.vue";
 import FileInput from "../../../components/UI/Form/FileInput.vue";
@@ -21,28 +21,24 @@ describe("MemberRowEdit.vue", () => {
             FileInput: true,
         },
     };
-
-    it("renders all editable inputs and buttons", async () => {
-        const wrapper = mount(MemberRowEdit, {
+    let wrapper;
+    beforeEach(() => {
+        wrapper = mount(MemberRowEdit, {
             props: defaultProps,
             global: defaultGlobal,
         });
-        await wrapper.vm.$nextTick();
+    })
 
+    it("renders all editable inputs and buttons", async () => {
         const baseInputs = wrapper.findAllComponents(BaseInput);
-        baseInputs.forEach((input) => {
-            expect(input.exists()).toBe(true);
-        });
 
-        const modelValues = baseInputs.map((input) =>
-            input.props("modelValue"),
-        );
+        const modelValues = baseInputs.map((input) => input.props("modelValue"));
+
         expect(modelValues).toContain(defaultProps.fullName);
         expect(modelValues).toContain(defaultProps.reportSubject);
         expect(modelValues).toContain(defaultProps.email);
 
         const fileInput = wrapper.findComponent(FileInput);
-        expect(fileInput.exists()).toBe(true);
         expect(fileInput.props("modelValue")).toBe(defaultProps.photo);
 
         const updateButton = wrapper.find('[data-testid="updateButton"]');
@@ -68,11 +64,6 @@ describe("MemberRowEdit.vue", () => {
     });
 
     it("emits update:photo", async () => {
-        const wrapper = mount(MemberRowEdit, {
-            props: defaultProps,
-            global: defaultGlobal,
-        });
-
         const file = new File([new Uint8Array(300 * 1024)], "test.jpg", {
             type: "image/jpeg",
         });
@@ -86,18 +77,19 @@ describe("MemberRowEdit.vue", () => {
     });
 
     it("emits update:fullName, update:reportSubject, update:email", async () => {
-        const wrapper = mount(MemberRowEdit, {
-            props: defaultProps,
-            global: defaultGlobal,
-        });
-
         const emittedValues = {
-            full_name: { event: "update:fullName", value: "Updated Name" },
+            full_name: {
+                event: "update:fullName",
+                value: "Updated Name"
+            },
             report_subject: {
                 event: "update:reportSubject",
                 value: "Updated Subject",
             },
-            email: { event: "update:email", value: "updated@example.com" },
+            email: {
+                event: "update:email",
+                value: "updated@example.com"
+            },
         };
 
         const baseInputs = wrapper.findAllComponents(BaseInput);
@@ -116,11 +108,6 @@ describe("MemberRowEdit.vue", () => {
     });
 
     it("emits update with memberId when update button is clicked", async () => {
-        const wrapper = mount(MemberRowEdit, {
-            props: defaultProps,
-            global: defaultGlobal,
-        });
-
         const updateButton = wrapper.find('[data-testid="updateButton"]');
         expect(updateButton.exists()).toBe(true);
 

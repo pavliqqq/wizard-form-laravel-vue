@@ -4,7 +4,20 @@ import BaseInput from "../../../components/UI/Form/BaseInput.vue";
 
 describe("BirthdateInput.vue", () => {
     const mockToday = new Date("2025-07-29");
+    const mockTodayString = mockToday.toISOString().split("T")[0];
     const expectedMaxDate = new Date("2009-07-29").toISOString().split("T")[0];
+
+    const defaultMountOptions = {
+        props: {
+            modelValue: mockTodayString,
+            errors: {},
+        },
+        global: {
+            stubs: {
+                BaseInput: true,
+            },
+        },
+    };
 
     beforeAll(() => {
         jest.useFakeTimers("modern").setSystemTime(mockToday);
@@ -14,68 +27,44 @@ describe("BirthdateInput.vue", () => {
         jest.useRealTimers();
     });
 
+    let wrapper;
+    beforeEach(() => {
+        wrapper = mount(BirthdateInput,  defaultMountOptions);
+    })
+
     it("renders input element with correct type and max attributes", async () => {
-        const wrapper = mount(BirthdateInput, {
-            props: {
-                modelValue: "",
-                errors: {},
-            },
-            global: {
-                stubs: {
-                    BaseInput: true,
-                },
-            },
-        });
-
-        await wrapper.vm.$nextTick();
-
         const baseInput = wrapper.findComponent(BaseInput);
         expect(baseInput.exists()).toBe(true);
 
         expect(baseInput.props("type")).toBe("date");
         expect(baseInput.props("max")).toBe(expectedMaxDate);
+        expect(baseInput.props("modelValue")).toBe(mockTodayString);
     });
 
     it("emits update:modelValue on date change", async () => {
-        const wrapper = mount(BirthdateInput, {
-            props: {
-                modelValue: "",
-                errors: {},
-            },
-            global: {
-                stubs: {
-                    BaseInput: true,
-                },
-            },
-        });
-
         const baseInput = wrapper.findComponent(BaseInput);
         expect(baseInput.exists()).toBe(true);
 
-        await baseInput.vm.$emit("update:modelValue", "2000-01-01");
+        const newData = new Date("2000-01-01").toISOString().split("T")[0];
+        await baseInput.vm.$emit("update:modelValue", newData);
 
         expect(wrapper.emitted("update:modelValue")).toBeTruthy();
-        expect(wrapper.emitted("update:modelValue")[0]).toEqual(["2000-01-01"]);
+        expect(wrapper.emitted("update:modelValue")[0]).toEqual([newData]);
     });
 
     it("displays error message when errors prop is provided", () => {
+        const error = "The birthdate field is required.";
+        const errors = { birthdate: error };
+
         const wrapper = mount(BirthdateInput, {
+            ...defaultMountOptions,
             props: {
-                modelValue: "",
-                errors: {
-                    birthdate: "The birthdate field is required.",
-                },
-            },
-            global: {
-                stubs: {
-                    BaseInput: true,
-                },
+                ...defaultMountOptions.props,
+                errors,
             },
         });
 
         const baseInput = wrapper.findComponent(BaseInput);
-        expect(baseInput.props("errors")).toEqual({
-            birthdate: "The birthdate field is required.",
-        });
+        expect(baseInput.props("errors")).toEqual(errors);
     });
 });

@@ -14,6 +14,7 @@ jest.mock("../../../router.js", () => ({
 }));
 
 describe("ThirdStep.vue", () => {
+    let wrapper;
     beforeEach(() => {
         jest.clearAllMocks();
 
@@ -23,11 +24,10 @@ describe("ThirdStep.vue", () => {
                 twitterUrl: "tw/url",
             },
         });
+        wrapper = mount(ThirdStep);
     });
 
     it("renders third step of form", async () => {
-        const wrapper = mount(ThirdStep);
-
         const links = ["facebookLink", "twitterLink", "allMembersLink"];
         links.forEach((link) => {
             const found = wrapper.findAll(`[data-testid=${link}]`);
@@ -39,8 +39,6 @@ describe("ThirdStep.vue", () => {
     });
 
     it("starts over when click startOver button", () => {
-        const wrapper = mount(ThirdStep);
-
         const localStorageSpy = jest.spyOn(
             window.localStorage.__proto__,
             "clear",
@@ -53,8 +51,6 @@ describe("ThirdStep.vue", () => {
     });
 
     it("goes to allMembers", () => {
-        const wrapper = mount(ThirdStep);
-
         wrapper.vm.goToAllMembers();
 
         const routePush = { name: "all.members" };

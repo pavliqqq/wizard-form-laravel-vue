@@ -1,4 +1,4 @@
-import { flushPromises, mount } from "@vue/test-utils";
+import { mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import FirstStep from "../../../components/Form/Pages/FirstStep.vue";
 import BaseInput from "../../../components/UI/Form/BaseInput.vue";
@@ -14,21 +14,11 @@ global.fetch = jest.fn().mockResolvedValue({
     json: () => Promise.resolve({ country: "US" }),
 });
 
-const mockClearErrors = jest.fn();
-const mockShowErrors = jest.fn();
 const mockUpdate = jest.fn().mockResolvedValue({
     data: {},
 });
 
 jest.mock("axios");
-
-jest.mock("../../../stores/errorStore.js", () => ({
-    useErrorStore: () => ({
-        errors: {},
-        clearErrors: mockClearErrors,
-        showErrors: mockShowErrors,
-    }),
-}));
 
 describe("FirstStep.vue", () => {
     const defaultGlobal = {
@@ -53,6 +43,7 @@ describe("FirstStep.vue", () => {
         email: "test@example.com",
     };
 
+    let wrapper;
     beforeEach(() => {
         setActivePinia(createPinia());
         jest.clearAllMocks();
@@ -63,16 +54,14 @@ describe("FirstStep.vue", () => {
                 countries: [{ code: "US" }, { code: "UA" }],
             },
         });
-    });
 
-    it("renders first step of form", async () => {
-        const wrapper = mount(FirstStep, {
+        wrapper = mount(FirstStep, {
             props: defaultProps,
             global: defaultGlobal,
         });
+    });
 
-        await flushPromises();
-
+    it("renders first step of form", async () => {
         const components = [BaseInput, PhoneInput, BirthdateInput];
         components.forEach((component) => {
             const found = wrapper.findAllComponents(component);
@@ -91,19 +80,12 @@ describe("FirstStep.vue", () => {
             global: defaultGlobal,
         });
 
-        await flushPromises();
         expect(wrapper.vm.Data).toEqual(saved);
     });
 
     it("creates member", async () => {
-        const wrapper = mount(FirstStep, {
-            props: defaultProps,
-            global: defaultGlobal,
-        });
-
         const returnedId = "11";
         const returnedEmail = "email@test.com";
-
         axios.post.mockResolvedValue({
             data: {
                 id: returnedId,
@@ -124,11 +106,8 @@ describe("FirstStep.vue", () => {
         jest.spyOn(caseConverter, "camelToSnakeObj").mockReturnValue(snakeData);
 
         await wrapper.vm.createMemberService.createMember();
-        await flushPromises();
 
-        expect(caseConverter.camelToSnakeObj).toHaveBeenCalledWith(
-            wrapper.vm.Data,
-        );
+        expect(caseConverter.camelToSnakeObj).toHaveBeenCalledWith(wrapper.vm.Data);
         expect(axios.post).toHaveBeenCalledWith("/api/members", snakeData);
         expect(localStorage.getItem("id")).toBe(returnedId);
         expect(localStorage.getItem("email")).toBe(returnedEmail);
@@ -153,14 +132,13 @@ describe("FirstStep.vue", () => {
         };
 
         await wrapper.vm.updateMemberService.updateMember();
-        await flushPromises();
 
         expect(wrapper.vm.memberId).toBe(id);
         expect(mockUpdate).toHaveBeenCalledWith(data);
         expect(wrapper.emitted("next")).toBeTruthy();
     });
 
-    it("choses action: create member", async () => {
+    it("chooses action: create member", async () => {
         const email = "email@test.com";
         localStorage.setItem("email", email);
 
@@ -176,7 +154,6 @@ describe("FirstStep.vue", () => {
         localStorage.getItem("email");
 
         wrapper.vm.action();
-        await flushPromises();
 
         expect(wrapper.vm.originalEmail).toBe(email);
         expect(wrapper.vm.Data.email).toBe("");
@@ -201,7 +178,6 @@ describe("FirstStep.vue", () => {
         localStorage.getItem("email");
 
         wrapper.vm.action();
-        await flushPromises();
 
         expect(wrapper.vm.originalEmail).toBe(email);
         expect(wrapper.vm.Data.email).toBe(email);

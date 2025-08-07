@@ -1,22 +1,11 @@
-import { flushPromises, mount } from "@vue/test-utils";
+import { mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import SecondStep from "../../../components/Form/Pages/SecondStep.vue";
 import BaseInput from "../../../components/UI/Form/BaseInput.vue";
 import BaseTextArea from "../../../components/UI/Form/BaseTextArea.vue";
 import FileInput from "../../../components/UI/Form/FileInput.vue";
 
-const mockClearErrors = jest.fn();
-const mockShowErrors = jest.fn();
-
 jest.mock("axios");
-
-jest.mock("../../../stores/errorStore.js", () => ({
-    useErrorStore: () => ({
-        errors: {},
-        clearErrors: mockClearErrors,
-        showErrors: mockShowErrors,
-    }),
-}));
 
 describe("SecondStep.vue", () => {
     const defaultGlobal = {
@@ -35,20 +24,19 @@ describe("SecondStep.vue", () => {
         photo: null,
     };
 
+    let wrapper;
     beforeEach(() => {
         setActivePinia(createPinia());
         jest.clearAllMocks();
         localStorage.clear();
-    });
 
-    it("renders second step of form", async () => {
-        const wrapper = mount(SecondStep, {
+        wrapper = mount(SecondStep, {
             props: { errors: {} },
             global: defaultGlobal,
         });
+    });
 
-        await flushPromises();
-
+    it("renders second step of form", async () => {
         const components = [BaseInput, BaseTextArea, FileInput];
         components.forEach((component) => {
             const found = wrapper.findAllComponents(component);
@@ -69,7 +57,6 @@ describe("SecondStep.vue", () => {
             global: defaultGlobal,
         });
 
-        await flushPromises();
         expect(wrapper.vm.Data).toEqual(saved);
     });
 
@@ -77,9 +64,7 @@ describe("SecondStep.vue", () => {
         localStorage.setItem("secondStep", JSON.stringify(saved));
 
         const count = 42;
-        const mockUpdate = jest
-            .fn()
-            .mockResolvedValue({ data: { count: count } });
+        const mockUpdate = jest.fn().mockResolvedValue({ data: { count: count } });
         const localStorageSpy = jest.spyOn(
             window.localStorage.__proto__,
             "setItem",
@@ -95,7 +80,6 @@ describe("SecondStep.vue", () => {
         };
 
         await wrapper.vm.submitService.submit();
-        await flushPromises();
 
         expect(mockUpdate).toHaveBeenCalledWith(data);
         expect(localStorageSpy).toHaveBeenCalledWith("count", count);

@@ -14,11 +14,14 @@ describe("MemberRow.vue", () => {
         isAdmin: false,
     };
 
-    it("renders correct elements when isAdmin is false", () => {
-        const wrapper = mount(MemberRow, {
+    let wrapper;
+    beforeEach(() => {
+        wrapper = mount(MemberRow, {
             props: defaultProps,
         });
+    })
 
+    it("renders correct elements", () => {
         const member = defaultProps.member;
 
         expect(wrapper.html()).toContain(member.full_name);
@@ -26,16 +29,14 @@ describe("MemberRow.vue", () => {
         expect(wrapper.html()).toContain(member.email);
 
         const img = wrapper.find('[data-testid="photo-img"]');
+
         expect(wrapper.exists()).toBe(true);
         expect(img.attributes("src")).toContain(member.photo);
     });
 
     it("renders correct email link", () => {
-        const wrapper = mount(MemberRow, {
-            props: defaultProps,
-        });
-
         const link = wrapper.find('[data-testid="email-link"]');
+
         expect(link.exists()).toBe(true);
         expect(link.attributes("href")).toBe(
             `https://mail.google.com/mail/?view=cm&fs=1&to=${defaultProps.member.email}`,
@@ -51,15 +52,11 @@ describe("MemberRow.vue", () => {
         });
 
         expect(wrapper.find('[data-testid="edit-button"]').exists()).toBe(true);
-        expect(wrapper.find('[data-testid="delete-button"]').exists()).toBe(
-            true,
-        );
-        expect(
-            wrapper.find('[data-testid="toggleVisibility-button"]').exists(),
-        ).toBe(true);
+        expect(wrapper.find('[data-testid="delete-button"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="toggleVisibility-button"]').exists()).toBe(true);
     });
 
-    it("emits edit, delete, toggle with click when isAdmin is true", async () => {
+    it("emits edit, delete, toggle", async () => {
         const wrapper = mount(MemberRow, {
             props: {
                 ...defaultProps,
@@ -77,9 +74,7 @@ describe("MemberRow.vue", () => {
         expect(wrapper.emitted().delete).toBeTruthy();
         expect(wrapper.emitted().delete[0]).toEqual([defaultProps.member.id]);
 
-        const toggleButton = wrapper.find(
-            '[data-testid="toggleVisibility-button"]',
-        );
+        const toggleButton = wrapper.find('[data-testid="toggleVisibility-button"]');
         await toggleButton.trigger("click");
         expect(wrapper.emitted().toggle).toBeTruthy();
         expect(wrapper.emitted().toggle[0]).toEqual([defaultProps.member]);

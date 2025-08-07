@@ -1,4 +1,4 @@
-import { mount } from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import BaseTextArea from "../../../components/UI/Form/BaseTextArea.vue";
 
 describe("BaseTextArea.vue", () => {
@@ -8,49 +8,47 @@ describe("BaseTextArea.vue", () => {
         modelValue: "Text about me",
         errors: {},
     };
-
-    it("renders textArea element with correct attributes", () => {
-        const wrapper = mount(BaseTextArea, {
+    let wrapper;
+    beforeEach(() => {
+        wrapper = mount(BaseTextArea, {
             props: defaultProps,
         });
+    })
 
+    it("renders textArea element with correct attributes", () => {
         const textArea = wrapper.find("textarea");
 
         expect(textArea.exists()).toBe(true);
-        expect(textArea.attributes("name")).toBe("about_me");
-        expect(textArea.attributes("placeholder")).toBe("About Me");
-        expect(textArea.element.value).toBe("Text about me");
+        expect(textArea.attributes("name")).toBe(defaultProps.name);
+        expect(textArea.attributes("placeholder")).toBe(defaultProps.placeholder);
+        expect(textArea.element.value).toBe(defaultProps.modelValue);
     });
 
     it("emits update:modelValue on textArea", async () => {
-        const wrapper = mount(BaseTextArea, {
-            props: defaultProps,
-        });
-
         const textArea = wrapper.find("textarea");
 
-        expect(textArea.element.value).toBe("Text about me");
+        expect(textArea.element.value).toBe(defaultProps.modelValue);
 
-        await textArea.setValue("Second text about me");
+        const newText = "Second text about me"
+        await textArea.setValue(newText);
 
         expect(wrapper.emitted("update:modelValue")).toBeTruthy();
-        expect(wrapper.emitted("update:modelValue")[0]).toEqual([
-            "Second text about me",
-        ]);
+        expect(wrapper.emitted("update:modelValue")[0]).toEqual([ newText ]);
     });
 
     it("displays error message when errors prop is provided", () => {
+        const error = "The about me field is required."
         const wrapper = mount(BaseTextArea, {
             props: {
                 ...defaultProps,
                 errors: {
-                    about_me: "The about me field is required.",
+                    about_me: error,
                 },
             },
         });
 
-        const errorDiv = wrapper.find("div.text-red-600");
+        const errorDiv = wrapper.find(`[data-testid="${defaultProps.name}-error"]`);
         expect(errorDiv.exists()).toBe(true);
-        expect(errorDiv.text()).toEqual("The about me field is required.");
+        expect(errorDiv.text()).toEqual(error);
     });
 });

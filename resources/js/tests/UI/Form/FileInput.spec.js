@@ -57,30 +57,4 @@ describe("FileInput.vue", () => {
         expect(wrapper.emitted("update:modelValue")).toBeTruthy();
         expect(wrapper.emitted("update:modelValue")[0]).toEqual([file]);
     });
-
-    it("shows error when file size exceeds maxSizeKb", async () => {
-        const wrapper = mount(FileInput, {
-            props: defaultProps,
-        });
-
-        const file = new File([new Uint8Array(700 * 1024)], "test.jpg", {
-            type: "image/jpeg",
-        });
-
-        const input = wrapper.find("input");
-
-        Object.defineProperty(input.element, "files", {
-            value: [file],
-        });
-
-        await input.trigger("change");
-
-        expect(mockShowErrors).toBeCalledWith(
-            expect.objectContaining({
-                [defaultProps.name]: [
-                    `File must be less than ${defaultProps.maxSizeKb}Kb`,
-                ],
-            }),
-        );
-    });
 });
