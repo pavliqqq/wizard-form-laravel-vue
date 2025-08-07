@@ -20,17 +20,21 @@ describe("BaseTable.vue", () => {
     });
 
     it("renders slot content", () => {
+        const data = {
+            fullName: 'David Test',
+            email: 'test@example.com'
+        }
+
         const wrapper = mount(BaseTable, {
             props: defaultProps,
             slots: {
-                default:
-                    "<tr><td>David Test</td><td>test@example.com</td></tr>",
+                default: `<tr><td>${data.fullName}</td><td>${data.email}</td></tr>`,
             },
         });
 
         const tds = wrapper.findAll("td");
         expect(tds).toHaveLength(defaultProps.headers.length);
-        expect(wrapper.text()).toContain("David Test");
-        expect(wrapper.text()).toContain("test@example.com");
+        expect(wrapper.text()).toContain(data.fullName);
+        expect(wrapper.text()).toContain(data.email);
     });
 });
