@@ -44,7 +44,6 @@ import BaseTable from "../UI/Form/BaseTable.vue";
 import { useErrorStore } from "../../stores/errorStore.js";
 import { createFormData } from "../../helpers/request.js";
 import { useAdminStore } from "../../stores/adminStore.js";
-import { splitter } from "../../helpers/fullNameSplitter.js";
 import axios from "axios";
 
 const members = ref([]);
@@ -125,11 +124,9 @@ const getMembersService = {
 };
 
 async function updateMember(id) {
-    const { firstName, lastName } = splitter(editForm.value.fullName);
 
     const Data = {
-        firstName: firstName,
-        lastName: lastName,
+        full_name: editForm.value.fullName,
         reportSubject: editForm.value.reportSubject,
         email: editForm.value.email,
         photo: editPhoto.value,
