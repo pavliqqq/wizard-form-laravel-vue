@@ -4,7 +4,6 @@ import BaseTable from "../../components/UI/Form/BaseTable.vue";
 import MemberRow from "../../components/UI/Form/MemberRow.vue";
 import MemberRowEdit from "../../components/UI/Form/MemberRowEdit.vue";
 import { createPinia, setActivePinia } from "pinia";
-import * as fullNameSplitter from "../../helpers/fullNameSplitter";
 import * as requestHelpers from "../../helpers/request";
 import axios from "axios";
 
@@ -26,13 +25,6 @@ jest.mock("../../stores/adminStore.js", () => ({
 }));
 
 describe("AllMembers", () => {
-    beforeEach(() => {
-        setActivePinia(createPinia());
-        jest.clearAllMocks();
-
-        axios.get.mockResolvedValue({ data: { members: [] } });
-    });
-
     const defaultGlobal = {
         global: {
             stubs: {
@@ -52,9 +44,16 @@ describe("AllMembers", () => {
         visibility: true,
     };
 
-    it("renders allMembers table", async () => {
-        const wrapper = mount(AllMembers, defaultGlobal);
+    let wrapper;
+    beforeEach(() => {
+        setActivePinia(createPinia());
+        jest.clearAllMocks();
 
+        axios.get.mockResolvedValue({ data: { members: [] } });
+        wrapper = mount(AllMembers, defaultGlobal);
+    });
+
+    it("renders allMembers table", async () => {
         wrapper.vm.members = [member];
 
         await wrapper.vm.$nextTick();
@@ -67,8 +66,6 @@ describe("AllMembers", () => {
     });
 
     it("excludes feature columns when user is not admin", async () => {
-        const wrapper = mount(AllMembers, defaultGlobal);
-
         const adminFeatures = ["Edit", "Delete", "Visible"];
 
         adminFeatures.forEach((feature) => {
@@ -88,8 +85,6 @@ describe("AllMembers", () => {
     });
 
     it("renders MemberRowEdit for editing member", async () => {
-        const wrapper = mount(AllMembers, defaultGlobal);
-
         wrapper.vm.members = [member];
         wrapper.vm.editMemberId = member.id;
 
@@ -103,16 +98,17 @@ describe("AllMembers", () => {
     });
 
     it("resets editPhoto, editPhotoPreview", async () => {
-        const wrapper = mount(AllMembers, defaultGlobal);
-
         global.URL.createObjectURL = jest.fn();
         global.URL.revokeObjectURL = jest.fn();
 
-        wrapper.vm.editPhoto = "editPhotoTest.jpg";
-        wrapper.vm.editPhotoPreview = "editPhotoPreviewTest.jpg";
+        const editPhoto = "editPhotoTest.jpg";
+        wrapper.vm.editPhoto = editPhoto;
 
-        expect(wrapper.vm.editPhoto).toBe("editPhotoTest.jpg");
-        expect(wrapper.vm.editPhotoPreview).toBe("editPhotoPreviewTest.jpg");
+        const editPhotoPreview = "editPhotoPreviewTest.jpg";
+        wrapper.vm.editPhotoPreview = editPhotoPreview;
+
+        expect(wrapper.vm.editPhoto).toBe(editPhoto);
+        expect(wrapper.vm.editPhotoPreview).toBe(editPhotoPreview);
 
         wrapper.vm.photoService.resetPhoto();
 
@@ -121,8 +117,6 @@ describe("AllMembers", () => {
     });
 
     it("updates form value and clears errors when changeMember is called", async () => {
-        const wrapper = mount(AllMembers, defaultGlobal);
-
         const resetPhotoMock = jest
             .spyOn(wrapper.vm.photoService, "resetPhoto")
             .mockImplementation(() => {});
@@ -174,20 +168,9 @@ describe("AllMembers", () => {
     });
 
     it("updates member", async () => {
-        const wrapper = mount(AllMembers, defaultGlobal);
-
         const file = new File([new Uint8Array(300 * 1024)], "test.jpg", {
             type: "image/jpeg",
         });
-
-        const nameParts = {
-            firstName: "Peter",
-            lastName: "Parker",
-        };
-
-        const splitterMock = jest
-            .spyOn(fullNameSplitter, "splitter")
-            .mockReturnValue(nameParts);
 
         const getMembersMock = jest
             .spyOn(wrapper.vm.getMembersService, "getMembers")
@@ -214,10 +197,8 @@ describe("AllMembers", () => {
         const memberId = 7;
         await wrapper.vm.updateMember(memberId);
 
-        expect(splitterMock).toHaveBeenCalledWith(wrapper.vm.editForm.fullName);
         expect(formDataHelper).toHaveBeenCalledWith({
-            firstName: nameParts.firstName,
-            lastName: nameParts.lastName,
+            full_name: wrapper.vm.editForm.fullName,
             reportSubject: wrapper.vm.editForm.reportSubject,
             email: wrapper.vm.editForm.email,
             photo: wrapper.vm.editPhoto,
@@ -232,8 +213,6 @@ describe("AllMembers", () => {
     });
 
     it("toggles visibility of member", async () => {
-        const wrapper = mount(AllMembers, defaultGlobal);
-
         const visible = false;
         axios.post.mockResolvedValue({
             data: { visible },
@@ -249,8 +228,6 @@ describe("AllMembers", () => {
     });
 
     it("deletes member", async () => {
-        const wrapper = mount(AllMembers, defaultGlobal);
-
         const getMembersMock = jest
             .spyOn(wrapper.vm.getMembersService, "getMembers")
             .mockImplementation(() => {});
