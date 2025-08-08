@@ -40,7 +40,7 @@ php artisan key:generate
 
 ```bash
 npm install
-npm run prod
+npm run dev
 ```
 
 ### 5. Database Setup
