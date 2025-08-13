@@ -12,6 +12,7 @@
                         placeholder="email"
                         v-model="Data.email"
                         :errors="errors"
+                        data-testid="emailInput"
                     />
                 </div>
 
@@ -22,6 +23,7 @@
                         placeholder="password"
                         v-model="Data.password"
                         :errors="errors"
+                        data-testid="passwordInput"
                     />
                 </div>
 
