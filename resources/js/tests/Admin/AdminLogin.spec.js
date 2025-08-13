@@ -2,6 +2,7 @@ import {flushPromises, mount} from "@vue/test-utils";
 import router from "../../router.js";
 import AdminLogin from "../../components/Admin/AdminLogin.vue";
 import { createPinia, setActivePinia } from "pinia";
+import { renderComponentsCheck } from "../helpers/renderHelpers.js"
 import axios from "axios";
 
 const mockCheckUser = jest.fn();
@@ -50,11 +51,7 @@ describe("Admin login form", () => {
 
     it("renders login form", () => {
         const componentNames = ['emailInput', 'passwordInput', 'submitButton'];
-
-        componentNames.forEach((name) => {
-            const component = wrapper.find(`[data-testid="${name}"]`);
-            expect(component.exists()).toBe(true)
-        })
+        renderComponentsCheck(componentNames, wrapper);
     });
 
     it("redirects to members page after successful login", async () => {
@@ -79,7 +76,7 @@ describe("Admin login form", () => {
         expect(router.push).toHaveBeenCalledWith(routePush);
     });
 
-    it('shows errors if login fails', async () => {
+    it('shows errors if authorization fails', async () => {
         const errors = {
             email: ["Email is required"],
         };
