@@ -6,7 +6,7 @@
             </h2>
 
             <div class="overflow-x-auto">
-                <BaseTable :headers="tableHeaders">
+                <BaseTable :headers="tableHeaders" data-testid="membersTable">
                     <template v-for="member in members" :key="member.id">
                         <MemberRowEdit
                             v-if="isEdit(member.id)"
@@ -20,6 +20,7 @@
                             @update="updateMember"
                             @cancelEdit="cancelEditMember"
                             :errors="errors"
+                            data-testid="memberRowEdit"
                         />
                         <MemberRow
                             v-else
@@ -28,6 +29,7 @@
                             @edit="changeMember"
                             @delete="deleteMember"
                             @toggle="toggleVisibility"
+                            data-testid="memberRow"
                         />
                     </template>
                 </BaseTable>
@@ -136,11 +138,7 @@ async function updateMember(id) {
     formData.append("_method", "patch");
 
     try {
-        await axios.post(`api/admin/members/${id}`, formData, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-        });
+        await axios.post(`api/admin/members/${id}`, formData);
         editMemberId.value = null;
         photoService.resetPhoto();
         await getMembersService.getMembers();
