@@ -1,4 +1,4 @@
-import { mount } from "@vue/test-utils";
+import {flushPromises, mount} from "@vue/test-utils";
 import router from "../../router.js";
 import AdminLogin from "../../components/Admin/AdminLogin.vue";
 import { createPinia, setActivePinia } from "pinia";
@@ -69,6 +69,8 @@ describe("Admin login form", () => {
 
         await wrapper.vm.login();
 
+        await flushPromises();
+
         expect(axios.get).toHaveBeenCalledWith("/sanctum/csrf-cookie");
         expect(axios.post).toHaveBeenCalledWith("/api/login", value);
         expect(mockCheckUser).toHaveBeenCalled();
@@ -87,6 +89,8 @@ describe("Admin login form", () => {
         });
 
         await wrapper.vm.login();
+
+        await flushPromises();
 
         expect(mockShowErrors).toHaveBeenCalledWith(errors);
     })
