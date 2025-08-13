@@ -1,7 +1,6 @@
 import { mount } from "@vue/test-utils";
 import router from "../../router.js";
 import AdminLogin from "../../components/Admin/AdminLogin.vue";
-import BaseInput from "../../components/UI/Form/BaseInput.vue";
 import { createPinia, setActivePinia } from "pinia";
 import axios from "axios";
 
@@ -32,7 +31,7 @@ jest.mock("../../stores/adminStore.js", () => ({
     }),
 }));
 
-describe("AdminLogin.vue", () => {
+describe("Admin login form", () => {
     let wrapper;
 
     const defaultGlobal = {
@@ -50,21 +49,18 @@ describe("AdminLogin.vue", () => {
     });
 
     it("renders login form", () => {
-        const baseInputs = wrapper.findAllComponents(BaseInput);
+        const componentNames = ['emailInput', 'passwordInput', 'submitButton'];
 
-        const expectedNames = ["email", "password"];
-
-        const names = baseInputs.map((input) => input.props("name"));
-
-        expectedNames.forEach((name) => {
-            expect(names).toContain(name);
-        });
-
-        const submitButton = wrapper.find('[data-testid="submitButton"]');
-        expect(submitButton.exists()).toBe(true);
+        componentNames.forEach((name) => {
+            const component = wrapper.find(`[data-testid="${name}"]`);
+            expect(component.exists()).toBe(true)
+        })
     });
 
-    it("logs in admin account", async () => {
+    it("redirects to members page after successful login", async () => {
+        axios.get.mockResolvedValue({});
+        axios.post.mockResolvedValue({ success: true });
+
         const value = {
             email: "admin@example.com",
             password: "12345678",
@@ -76,6 +72,7 @@ describe("AdminLogin.vue", () => {
         expect(axios.get).toHaveBeenCalledWith("/sanctum/csrf-cookie");
         expect(axios.post).toHaveBeenCalledWith("/api/login", value);
         expect(mockCheckUser).toHaveBeenCalled();
+
         const routePush = { name: "all.members" };
         expect(router.push).toHaveBeenCalledWith(routePush);
     });
@@ -85,7 +82,7 @@ describe("AdminLogin.vue", () => {
             email: ["Email is required"],
         };
 
-        axios.post.mockRejectedValueOnce({
+        axios.post.mockRejectedValue({
             response: { status: 422, data: { errors } },
         });
 
