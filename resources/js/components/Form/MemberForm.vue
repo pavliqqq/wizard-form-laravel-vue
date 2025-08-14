@@ -6,6 +6,7 @@
             :errors="errors"
             @next="nextStep"
             @prev="prevStep"
+            :data-testid="currentTestId"
         />
     </KeepAlive>
 </template>
@@ -22,11 +23,16 @@ import axios from "axios";
 const errorStore = useErrorStore();
 const errors = errorStore.errors;
 
-const currentStep = computed(() => steps[currentIndex.value]);
+const currentStep = computed(() => steps[currentIndex.value].component);
+const currentTestId = computed(() => steps[currentIndex.value].testId);
 
 const currentIndex = ref(0);
 
-const steps = [FirstStep, SecondStep, ThirdStep];
+const steps = [
+  { component: FirstStep, testId: 'firstStep' },
+  { component: SecondStep, testId: 'secondStep' },
+  { component: ThirdStep, testId: 'thirdStep' }
+];
 
 onMounted(() => {
     const saved = parseInt(localStorage.getItem("currentStep"));
