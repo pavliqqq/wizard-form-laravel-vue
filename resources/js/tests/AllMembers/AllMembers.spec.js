@@ -31,8 +31,7 @@ describe("Members table", () => {
         global: {
             stubs: {
                 MemberRow: true,
-                MemberRowEdit: true,
-                FileInput: true,
+                MemberRowEdit: true
             },
         },
     };
@@ -64,7 +63,7 @@ describe("Members table", () => {
         renderComponentsCheck(components, wrapper);
     });
 
-    it("excludes feature columns when user is not admin", async () => {
+    it("excludes feature columns when user is not admin",() => {
         const adminFeatures = ["Edit", "Delete", "Visible"];
 
         adminFeatures.forEach((feature) => {
@@ -72,7 +71,7 @@ describe("Members table", () => {
         });
     });
 
-    it("includes feature columns when user is admin", async () => {
+    it("includes feature columns when user is admin",() => {
         mockIsAdmin = true;
         const wrapper = mount(AllMembers, defaultGlobal);
 
@@ -93,7 +92,7 @@ describe("Members table", () => {
         renderComponentsCheck(components, wrapper);
     });
 
-    it("resets photo selection and preview", async () => {
+    it("resets photo selection and preview", () => {
         global.URL.createObjectURL = jest.fn();
         global.URL.revokeObjectURL = jest.fn();
 
@@ -107,7 +106,7 @@ describe("Members table", () => {
         expect(wrapper.vm.editPhotoPreview).toBe(null);
     });
 
-    it("prepares the form for editing selected member", async () => {
+    it("prepares the form for editing selected member", () => {
         const resetPhotoMock = jest
             .spyOn(wrapper.vm.photoService, "resetPhoto")
             .mockImplementation(() => {});
@@ -144,9 +143,7 @@ describe("Members table", () => {
             mockIsAdmin = isAdmin;
 
             axios.get.mockResolvedValue({
-                data: {
-                    members: [member],
-                },
+                data: { members: [member] },
             });
 
             const wrapper = mount(AllMembers, defaultGlobal);
