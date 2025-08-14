@@ -1,11 +1,9 @@
 import { mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import FirstStep from "../../../components/Form/Pages/FirstStep.vue";
-import BaseInput from "../../../components/UI/Form/BaseInput.vue";
-import PhoneInput from "../../../components/UI/Form/CountryPhoneInput.vue";
-import BirthdateInput from "../../../components/UI/Form/BirthdateInput.vue";
 import * as caseConverter from "../../../helpers/caseConverter";
 import axios from "axios";
+import {renderComponentsCheck} from "../../helpers/renderHelpers.js";
 
 global.fetch = jest.fn().mockResolvedValue({
     ok: true,
@@ -14,13 +12,18 @@ global.fetch = jest.fn().mockResolvedValue({
     json: () => Promise.resolve({ country: "US" }),
 });
 
-const mockUpdate = jest.fn().mockResolvedValue({
-    data: {},
-});
+const mockUpdate = jest.fn();
+const mockShowErrors = jest.fn();
+
+jest.mock('../../../stores/errorStore.js', () => ({
+    useErrorStore: () => ({
+        showErrors: mockShowErrors
+    })
+}))
 
 jest.mock("axios");
 
-describe("FirstStep.vue", () => {
+describe("First step of main form", () => {
     const defaultGlobal = {
         stubs: {
             BaseInput: true,
@@ -33,11 +36,21 @@ describe("FirstStep.vue", () => {
         errors: {},
     };
 
-    const saved = {
+    const testData = {
         firstName: "Peter",
         lastName: "Parker",
         birthdate: "1980-01-01",
         reportSubject: "Spiders",
+        country: "UA",
+        phone: "380996663300",
+        email: "test@example.com",
+    };
+
+    const snakeTestData = {
+        first_name: "Peter",
+        last_name: "Parker",
+        birthdate: "1980-01-01",
+        report_subject: "Spiders",
         country: "UA",
         phone: "380996663300",
         email: "test@example.com",
@@ -50,9 +63,7 @@ describe("FirstStep.vue", () => {
         localStorage.clear();
 
         axios.get.mockResolvedValue({
-            data: {
-                countries: [{ code: "US" }, { code: "UA" }],
-            },
+            data: { countries: [{ code: "US" }, { code: "UA" }] },
         });
 
         wrapper = mount(FirstStep, {
@@ -62,28 +73,29 @@ describe("FirstStep.vue", () => {
     });
 
     it("renders first step of form", async () => {
-        const components = [BaseInput, PhoneInput, BirthdateInput];
-        components.forEach((component) => {
-            const found = wrapper.findAllComponents(component);
-            expect(found.length).toBeGreaterThan(0);
-        });
+        const components = [
+            'firstNameInput', 'lastNameInput', 'birthdateInput',
+            'reportSubjectInput', 'phoneInput', 'emailInput'
+        ];
+
+        renderComponentsCheck(components, wrapper);
 
         const button = wrapper.find('[data-testid="nextButton"]');
         expect(button.exists()).toBe(true);
     });
 
-    it("stores data in localStorage", async () => {
-        localStorage.setItem("firstStep", JSON.stringify(saved));
+    it("restores previously saved data from localStorage on mount", async () => {
+        localStorage.setItem("firstStep", JSON.stringify(testData));
 
         const wrapper = mount(FirstStep, {
             props: defaultProps,
             global: defaultGlobal,
         });
 
-        expect(wrapper.vm.Data).toEqual(saved);
+        expect(wrapper.vm.Data).toEqual(testData);
     });
 
-    it("creates member", async () => {
+    it("creates member and proceeds to next step", async () => {
         const returnedId = "11";
         const returnedEmail = "email@test.com";
         axios.post.mockResolvedValue({
@@ -93,43 +105,57 @@ describe("FirstStep.vue", () => {
             },
         });
 
-        const snakeData = {
-            first_name: "Peter",
-            last_name: "Parker",
-            birthdate: "1980-01-01",
-            report_subject: "Spiders",
-            country: "UA",
-            phone: "380996663300",
-            email: "test@example.com",
-        };
-
-        jest.spyOn(caseConverter, "camelToSnakeObj").mockReturnValue(snakeData);
+        const caseConverterSpy = jest.spyOn(caseConverter, "camelToSnakeObj").mockReturnValue(snakeTestData);
 
         await wrapper.vm.createMemberService.createMember();
 
-        expect(caseConverter.camelToSnakeObj).toHaveBeenCalledWith(wrapper.vm.Data);
-        expect(axios.post).toHaveBeenCalledWith("/api/members", snakeData);
+        expect(caseConverterSpy).toHaveBeenCalledWith(wrapper.vm.Data);
+        expect(axios.post).toHaveBeenCalledWith("/api/members", snakeTestData);
         expect(localStorage.getItem("id")).toBe(returnedId);
         expect(localStorage.getItem("email")).toBe(returnedEmail);
         expect(wrapper.emitted("next")).toBeTruthy();
     });
 
-    it("updates member", async () => {
+    it("does not create member if creating request fails", async () => {
+        const returnedId = "11";
+        const returnedEmail = "email@test.com";
+
+        const errors = {
+            email: ["Email is required"],
+        };
+
+        axios.post.mockRejectedValue({
+            response: { status: 422, data: { errors } },
+        });
+
+        const caseConverterSpy = jest.spyOn(caseConverter, "camelToSnakeObj").mockReturnValue(snakeTestData);
+
+        await wrapper.vm.createMemberService.createMember();
+
+        expect(caseConverterSpy).toHaveBeenCalledWith(wrapper.vm.Data);
+        expect(axios.post).toHaveBeenCalledWith("/api/members", snakeTestData);
+        expect(localStorage.getItem("id")).not.toBe(returnedId);
+        expect(localStorage.getItem("email")).not.toBe(returnedEmail);
+        expect(wrapper.emitted("next")).toBeFalsy();
+        expect(mockShowErrors).toHaveBeenCalledWith(errors);
+    })
+
+    it("updates member and proceeds to next step", async () => {
         const id = "11";
         localStorage.setItem("id", id);
-        localStorage.setItem("firstStep", JSON.stringify(saved));
+        localStorage.setItem("firstStep", JSON.stringify(testData));
 
         const wrapper = mount(FirstStep, {
             props: defaultProps,
             global: defaultGlobal,
         });
 
-        localStorage.getItem("id");
-
         const data = {
             ...wrapper.vm.Data,
             id: id,
         };
+
+        mockUpdate.mockResolvedValue({data: { success: true }});
 
         await wrapper.vm.updateMemberService.updateMember();
 
@@ -138,7 +164,32 @@ describe("FirstStep.vue", () => {
         expect(wrapper.emitted("next")).toBeTruthy();
     });
 
-    it("chooses action: create member", async () => {
+    it("does not update member if updating request fails", async () => {
+        const id = "11";
+        localStorage.setItem("id", id);
+        localStorage.setItem("firstStep", JSON.stringify(testData));
+
+        const wrapper = mount(FirstStep, {
+            props: defaultProps,
+            global: defaultGlobal,
+        });
+
+        const data = {
+            ...wrapper.vm.Data,
+            id: id,
+        };
+        jest.spyOn(console, "error").mockImplementation(() => {});
+
+        mockUpdate.mockRejectedValue(new Error("Network error"));
+
+        await wrapper.vm.updateMemberService.updateMember();
+
+        expect(wrapper.vm.memberId).toBe(id);
+        expect(mockUpdate).toHaveBeenCalledWith(data);
+        expect(wrapper.emitted("next")).toBeFalsy();
+    })
+
+    it("calls method to create member when email is not yet registered", () => {
         const email = "email@test.com";
         localStorage.setItem("email", email);
 
@@ -147,8 +198,7 @@ describe("FirstStep.vue", () => {
             global: defaultGlobal,
         });
 
-        const mockCreateMember = jest
-            .spyOn(wrapper.vm.createMemberService, "createMember")
+        const mockCreateMember = jest.spyOn(wrapper.vm.createMemberService, "createMember")
             .mockImplementation(() => {});
 
         localStorage.getItem("email");
@@ -161,7 +211,7 @@ describe("FirstStep.vue", () => {
         expect(mockCreateMember).toHaveBeenCalled();
     });
 
-    it("choses action: update member", async () => {
+    it("calls method to update member when email is already registered", () => {
         const email = "email@test.com";
         localStorage.setItem("email", email);
 
@@ -170,8 +220,7 @@ describe("FirstStep.vue", () => {
             global: defaultGlobal,
         });
 
-        const mockUpdateMember = jest
-            .spyOn(wrapper.vm.updateMemberService, "updateMember")
+        const mockUpdateMember = jest.spyOn(wrapper.vm.updateMemberService, "updateMember")
             .mockImplementation(() => {});
 
         wrapper.vm.Data.email = email;
