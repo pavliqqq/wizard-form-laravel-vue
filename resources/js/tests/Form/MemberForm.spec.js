@@ -1,11 +1,9 @@
-import { flushPromises, mount } from "@vue/test-utils";
+import { mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
-import FirstStep from "../../components/Form/Pages/FirstStep.vue";
-import SecondStep from "../../components/Form/Pages/SecondStep.vue";
-import ThirdStep from "../../components/Form/Pages/ThirdStep.vue";
 import MemberForm from "../../components/Form/MemberForm.vue";
 import axios from "axios";
-import * as requestHelpers from "../../helpers/request";
+import {nextTick} from "vue";
+import {mockFormData} from "../helpers/mockHelpers.js";
 
 const mockClearErrors = jest.fn();
 const mockShowErrors = jest.fn();
@@ -14,19 +12,26 @@ jest.mock("axios");
 
 jest.mock("../../stores/errorStore.js", () => ({
     useErrorStore: () => ({
-        errors: {},
         clearErrors: mockClearErrors,
         showErrors: mockShowErrors,
     }),
 }));
 
-describe("MemberForm.vue", () => {
+describe("Member form", () => {
     const defaultGlobal = {
-        stubs: {
-            FirstStep: true,
-            SecondStep: true,
-            ThirdStep: true,
+        global: {
+            stubs: {
+                FirstStep: true,
+                SecondStep: true,
+                ThirdStep: true
+            },
         },
+    };
+
+    const testData = {
+        id: 123,
+        firstName: "Peter",
+        lastName: "Parker",
     };
 
     let wrapper;
@@ -35,76 +40,84 @@ describe("MemberForm.vue", () => {
         jest.clearAllMocks();
         localStorage.clear();
 
-        wrapper = mount(MemberForm, { global: defaultGlobal });
+        wrapper = mount(MemberForm, defaultGlobal);
     });
 
-    it("renders FirstStep by default", () => {
-        expect(wrapper.findComponent(FirstStep).exists()).toBe(true);
+    it("renders first step of form by default", () => {
+        expect(wrapper.find('[data-testid="firstStep"]').exists()).toBe(true);
     });
 
-    const steps = [FirstStep, SecondStep, ThirdStep];
+    const steps = ['firstStep', 'secondStep', 'thirdStep'];
 
-    it("reads current step from localStorage on mount", async () => {
+    it("restores last active step when component mounts", async () => {
         for (let index = 0; index < steps.length; index++) {
             localStorage.setItem("currentStep", index);
-            const wrapper = mount(MemberForm, { global: defaultGlobal });
+            const wrapper = mount(MemberForm, defaultGlobal);
 
-            await flushPromises();
+            await nextTick();
 
-            expect(wrapper.findComponent(steps[index]).exists()).toBe(true);
+            expect(wrapper.find(`[data-testid="${steps[index]}"]`).exists()).toBe(true);
 
             wrapper.unmount();
             localStorage.clear();
         }
     });
 
-    it("goes to next step on next event", async () => {
+    it("goes to the next step when next event is triggered", async () => {
         for (let index = 0; index < steps.length - 1; index++) {
             expect(wrapper.vm.currentIndex).toBe(index);
-            await wrapper.findComponent(steps[index]).vm.$emit("next");
+
+            wrapper.vm.nextStep();
+            await nextTick();
 
             expect(mockClearErrors).toHaveBeenCalled();
             expect(wrapper.vm.currentIndex).toBe(index + 1);
         }
     });
 
-    it("goes to prev step on prev event", async () => {
+    it("returns to the previous step when prev event is triggered", async () => {
         const index = 1;
         localStorage.setItem("currentStep", index.toString());
 
-        const wrapper = mount(MemberForm, { global: defaultGlobal });
+        const wrapper = mount(MemberForm, defaultGlobal);
 
         expect(wrapper.vm.currentIndex).toBe(index);
 
-        await flushPromises();
-
-        await wrapper.findComponent(steps[index]).vm.$emit("prev");
+        wrapper.vm.prevStep();
+        await nextTick();
 
         expect(mockClearErrors).toHaveBeenCalled();
         expect(wrapper.vm.currentIndex).toBe(index - 1);
     });
 
     it("updates member", async () => {
-        const mockAppend = jest.fn();
-        const fakeForm = { append: mockAppend };
-        jest.spyOn(requestHelpers, "createFormData").mockReturnValue(fakeForm);
+        const { mockAppend, fakeForm, formDataSpy } = mockFormData(jest);
 
-        const returnValue = { data: { status: "success" } };
-        axios.post = jest.fn().mockResolvedValue(returnValue);
+        axios.post.mockResolvedValue({ data: { status: "success" } });
 
-        const data = {
-            id: 123,
-            firstName: "Peter",
-            lastName: "Parker",
+        await wrapper.vm.update(testData);
+
+        expect(formDataSpy).toHaveBeenCalledWith(testData);
+        expect(mockAppend).toHaveBeenCalledWith("_method", "patch");
+        expect(axios.post).toHaveBeenCalledWith(`/api/members/${testData.id}`, fakeForm);
+    });
+
+    it("does not update member if updating fails", async () => {
+        const errors = {
+            email: ["Email is required"],
         };
 
-        const res = await wrapper.vm.update(data);
+        axios.post.mockRejectedValue({
+            response: { status: 422, data: { errors } },
+        });
 
-        expect(res).toBe(returnValue);
+        const { mockAppend, fakeForm, formDataSpy } = mockFormData(jest);
+
+        await wrapper.vm.update(testData);
+
+        expect(formDataSpy).toHaveBeenCalledWith(testData);
         expect(mockAppend).toHaveBeenCalledWith("_method", "patch");
-        expect(axios.post).toHaveBeenCalledWith(
-            `/api/members/${data.id}`,
-            fakeForm,
-        );
-    });
+        expect(axios.post).toHaveBeenCalledWith(`/api/members/${testData.id}`, fakeForm);
+        expect(mockShowErrors).toHaveBeenCalledWith(errors);
+    })
 });
