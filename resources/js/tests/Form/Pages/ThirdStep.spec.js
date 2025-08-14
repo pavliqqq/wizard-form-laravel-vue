@@ -1,10 +1,13 @@
-import { mount } from "@vue/test-utils";
+import {flushPromises, mount} from "@vue/test-utils";
 import router from "../../../router.js";
 import ThirdStep from "../../../components/Form/Pages/ThirdStep.vue";
 import axios from "axios";
+import {renderElementsCheck} from "../../helpers/renderHelpers.js";
 
 jest.mock("axios");
 
+const mockFacebookUrl = "fb/url";
+const mockTwitterUrl = "tw/url";
 jest.mock("../../../router.js", () => ({
     __esModule: true,
     default: {
@@ -13,47 +16,64 @@ jest.mock("../../../router.js", () => ({
     },
 }));
 
-describe("ThirdStep.vue", () => {
-    let wrapper;
-    beforeEach(() => {
+describe("Third step of main form", () => {
+    let wrapper, getMock;
+    beforeEach(async () => {
         jest.clearAllMocks();
 
-        axios.get.mockResolvedValue({
+        getMock = axios.get.mockResolvedValue({
             data: {
-                facebookUrl: "fb/url",
-                twitterUrl: "tw/url",
+                facebookUrl: mockFacebookUrl,
+                twitterUrl: mockTwitterUrl,
             },
         });
         wrapper = mount(ThirdStep);
+        await flushPromises();
     });
 
     it("renders third step of form", async () => {
         const links = ["facebookLink", "twitterLink", "allMembersLink"];
-        links.forEach((link) => {
-            const found = wrapper.findAll(`[data-testid=${link}]`);
-            expect(found.length).toBeGreaterThan(0);
-        });
+        renderElementsCheck(links, wrapper);
 
         const startOverButton = wrapper.find('[data-testid="startOver"]');
         expect(startOverButton.exists()).toBe(true);
     });
 
-    it("starts over when click startOver button", () => {
-        const localStorageSpy = jest.spyOn(
-            window.localStorage.__proto__,
-            "clear",
-        );
+    it("sets correct links for facebook and twitter", async () => {
+        const facebookLink = wrapper.find('[data-testid="facebookLink"]')
+        const twitterLink = wrapper.find('[data-testid="twitterLink"]')
 
-        wrapper.vm.startOver();
+        expect(facebookLink.attributes('href')).toBe(mockFacebookUrl);
+        expect(twitterLink.attributes('href')).toBe(mockTwitterUrl);
+    });
+
+    it("proceeds to first step and resets form when button is clicked", async() => {
+        const localStorageSpy = jest.spyOn(window.localStorage.__proto__, "clear");
+
+        const startOverButton = wrapper.find('[data-testid="startOver"]');
+        startOverButton.trigger('click');
 
         expect(localStorageSpy).toHaveBeenCalled();
         expect(router.go).toHaveBeenCalledWith(0);
     });
 
-    it("goes to allMembers", () => {
-        wrapper.vm.goToAllMembers();
+    it("proceeds to members table when the link is clicked", () => {
+        const allMembersLink = wrapper.find('[data-testid="allMembersLink"]');
+        allMembersLink.trigger('click');
 
         const routePush = { name: "all.members" };
         expect(router.push).toHaveBeenCalledWith(routePush);
     });
+
+    it("does not set social links if request fails", async () => {
+        jest.spyOn(console, "error").mockImplementation(() => {});
+        getMock.mockRejectedValue(new Error("Network error"));
+
+        wrapper = mount(ThirdStep);
+        await flushPromises();
+
+        expect(getMock).toHaveBeenCalledWith("/api/members/share");
+        expect(wrapper.vm.facebookUrl).toBeFalsy();
+        expect(wrapper.vm.twitterUrl).toBeFalsy();
+    })
 });
