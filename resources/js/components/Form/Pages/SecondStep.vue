@@ -11,6 +11,7 @@
                     placeholder="Company"
                     v-model="Data.company"
                     :errors="errors"
+                    data-testid="companyInput"
                 />
             </div>
 
@@ -20,6 +21,7 @@
                     placeholder="Position"
                     v-model="Data.position"
                     :errors="errors"
+                    data-testid="positionInput"
                 />
             </div>
 
@@ -29,6 +31,7 @@
                     placeholder="About Me"
                     v-model="Data.aboutMe"
                     :errors="errors"
+                    data-testid="aboutMeInput"
                 />
             </div>
 
@@ -38,6 +41,7 @@
                     v-model="Data.photo"
                     :maxSizeKb="500"
                     :errors="errors"
+                    data-testid="photoInput"
                 />
             </div>
         </div>
