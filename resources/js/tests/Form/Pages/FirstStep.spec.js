@@ -1,4 +1,4 @@
-import { mount } from "@vue/test-utils";
+import {flushPromises, mount} from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import FirstStep from "../../../components/Form/Pages/FirstStep.vue";
 import * as caseConverter from "../../../helpers/caseConverter";
@@ -56,7 +56,7 @@ describe("First step of main form", () => {
         email: "test@example.com",
     };
 
-    let wrapper, nextButton;
+    let wrapper;
     beforeEach(() => {
         setActivePinia(createPinia());
         jest.clearAllMocks();
@@ -70,8 +70,6 @@ describe("First step of main form", () => {
             props: defaultProps,
             global: defaultGlobal,
         });
-
-        nextButton = wrapper.find('[data-testid="nextButton"]');
     });
 
     it("renders first step of form", async () => {
@@ -82,6 +80,7 @@ describe("First step of main form", () => {
 
         renderElementsCheck(components, wrapper);
 
+        const nextButton = wrapper.find('[data-testid="nextButton"]');
         expect(nextButton.exists()).toBe(true);
     });
 
@@ -190,7 +189,7 @@ describe("First step of main form", () => {
         expect(wrapper.emitted("next")).toBeFalsy();
     })
 
-    it("calls method to create member when email is not yet registered", () => {
+    it("calls method to create member when email is not yet registered", async () => {
         const email = "email@test.com";
         localStorage.setItem("email", email);
 
@@ -199,11 +198,14 @@ describe("First step of main form", () => {
             global: defaultGlobal,
         });
 
+        await flushPromises();
+
         const mockCreateMember = jest.spyOn(wrapper.vm.createMemberService, "createMember")
             .mockImplementation(() => {});
 
         localStorage.getItem("email");
 
+        const nextButton = wrapper.find('[data-testid="nextButton"]');
         nextButton.trigger('click');
 
         expect(wrapper.vm.originalEmail).toBe(email);
@@ -212,7 +214,7 @@ describe("First step of main form", () => {
         expect(mockCreateMember).toHaveBeenCalled();
     });
 
-    it("calls method to update member when email is already registered", () => {
+    it("calls method to update member when email is already registered", async () => {
         const email = "email@test.com";
         localStorage.setItem("email", email);
 
@@ -221,12 +223,15 @@ describe("First step of main form", () => {
             global: defaultGlobal,
         });
 
+        await flushPromises();
+
         const mockUpdateMember = jest.spyOn(wrapper.vm.updateMemberService, "updateMember")
             .mockImplementation(() => {});
 
         wrapper.vm.Data.email = email;
         localStorage.getItem("email");
 
+        const nextButton = wrapper.find('[data-testid="nextButton"]');
         nextButton.trigger('click');
 
         expect(wrapper.vm.originalEmail).toBe(email);
