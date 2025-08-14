@@ -14,6 +14,7 @@
                     placeholder="First Name"
                     v-model="Data.firstName"
                     :errors="errors"
+                    data-testid="firstNameInput"
                 />
             </div>
             <div class="flex flex-col">
@@ -22,10 +23,15 @@
                     placeholder="Last Name"
                     v-model="Data.lastName"
                     :errors="errors"
+                    data-testid="lastNameInput"
                 />
             </div>
             <div class="flex flex-col">
-                <BirthdateInput v-model="Data.birthdate" :errors="errors" />
+                <BirthdateInput 
+                    v-model="Data.birthdate" 
+                    :errors="errors" 
+                    data-testid="birthdateInput"
+                />
             </div>
             <div class="flex flex-col">
                 <BaseInput
@@ -33,6 +39,7 @@
                     placeholder="Report Subject"
                     v-model="Data.reportSubject"
                     :errors="errors"
+                    data-testid="reportSubjectInput"
                 />
             </div>
             <div class="flex flex-col">
@@ -43,6 +50,7 @@
                     :items="countries"
                     :key="renderKey"
                     :errors="errors"
+                    data-testid="phoneInput"
                 />
             </div>
             <div class="flex flex-col">
@@ -52,6 +60,7 @@
                     placeholder="Email"
                     v-model="Data.email"
                     :errors="errors"
+                    data-testid="emailInput"
                 />
             </div>
         </div>
