@@ -1,13 +1,11 @@
 import { mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import SecondStep from "../../../components/Form/Pages/SecondStep.vue";
-import BaseInput from "../../../components/UI/Form/BaseInput.vue";
-import BaseTextArea from "../../../components/UI/Form/BaseTextArea.vue";
-import FileInput from "../../../components/UI/Form/FileInput.vue";
+import {renderComponentsCheck} from "../../helpers/renderHelpers.js";
 
 jest.mock("axios");
-
-describe("SecondStep.vue", () => {
+const mockUpdate = jest.fn();
+describe("Second step of main form", () => {
     const defaultGlobal = {
         stubs: {
             BaseInput: true,
@@ -16,7 +14,7 @@ describe("SecondStep.vue", () => {
         },
     };
 
-    const saved = {
+    const testData = {
         id: 11,
         company: "Test company",
         position: "Manager",
@@ -31,17 +29,18 @@ describe("SecondStep.vue", () => {
         localStorage.clear();
 
         wrapper = mount(SecondStep, {
-            props: { errors: {} },
+            props: { update: mockUpdate, errors: {} },
             global: defaultGlobal,
         });
     });
 
-    it("renders second step of form", async () => {
-        const components = [BaseInput, BaseTextArea, FileInput];
-        components.forEach((component) => {
-            const found = wrapper.findAllComponents(component);
-            expect(found.length).toBeGreaterThan(0);
-        });
+    it("renders second step of form", () => {
+        const components = [
+            'companyInput', 'positionInput',
+            'aboutMeInput', 'photoInput'
+        ];
+
+        renderComponentsCheck(components, wrapper);
 
         const nextButton = wrapper.find('[data-testid="nextButton"]');
         expect(nextButton.exists()).toBe(true);
@@ -49,40 +48,58 @@ describe("SecondStep.vue", () => {
         expect(backButton.exists()).toBe(true);
     });
 
-    it("stores data in localStorage", async () => {
-        localStorage.setItem("secondStep", JSON.stringify(saved));
+    it("restores previously saved data from localStorage on mount",() => {
+        localStorage.setItem("secondStep", JSON.stringify(testData));
 
-        const wrapper = mount(SecondStep, {
-            props: { errors: {} },
-            global: defaultGlobal,
-        });
-
-        expect(wrapper.vm.Data).toEqual(saved);
-    });
-
-    it("sumbits form", async () => {
-        localStorage.setItem("secondStep", JSON.stringify(saved));
-
-        const count = 42;
-        const mockUpdate = jest.fn().mockResolvedValue({ data: { count: count } });
-        const localStorageSpy = jest.spyOn(
-            window.localStorage.__proto__,
-            "setItem",
-        );
-
-        const wrapper = mount(SecondStep, {
+        wrapper = mount(SecondStep, {
             props: { update: mockUpdate, errors: {} },
             global: defaultGlobal,
         });
 
-        const data = {
-            ...wrapper.vm.Data,
-        };
+        expect(wrapper.vm.Data).toEqual(testData);
+    });
+
+    it("submits form and proceeds to next step", async () => {
+        const count = 42;
+
+        mockUpdate.mockResolvedValue({ data: { count: count } });
+        const localStorageSpy = jest.spyOn(window.localStorage.__proto__, "setItem");
+
+        wrapper = mount(SecondStep, {
+            props: { update: mockUpdate, errors: {} },
+            global: defaultGlobal,
+        });
+
+        const data = wrapper.vm.Data;
 
         await wrapper.vm.submitService.submit();
 
+        expect(localStorageSpy).toHaveBeenCalledWith("secondStep", JSON.stringify(data));
         expect(mockUpdate).toHaveBeenCalledWith(data);
         expect(localStorageSpy).toHaveBeenCalledWith("count", count);
         expect(wrapper.emitted("next")).toBeTruthy();
+    });
+
+    it("does not submit form if submitting request fails", async () => {
+        const count = 42;
+        const localStorageSpy = jest.spyOn(window.localStorage.__proto__, "setItem");
+
+        wrapper = mount(SecondStep, {
+            props: { update: mockUpdate, errors: {} },
+            global: defaultGlobal,
+        });
+
+        const data = wrapper.vm.Data;
+
+        jest.spyOn(console, "error").mockImplementation(() => {});
+
+        mockUpdate.mockRejectedValue(new Error("Network error"));
+
+        await wrapper.vm.submitService.submit();
+
+        expect(localStorageSpy).toHaveBeenCalledWith("secondStep", JSON.stringify(data));
+        expect(mockUpdate).toHaveBeenCalledWith(data);
+        expect(localStorageSpy).not.toHaveBeenCalledWith("count", count);
+        expect(wrapper.emitted("next")).toBeFalsy();
     });
 });
