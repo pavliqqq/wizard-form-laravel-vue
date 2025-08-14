@@ -3,7 +3,7 @@ import { createPinia, setActivePinia } from "pinia";
 import FirstStep from "../../../components/Form/Pages/FirstStep.vue";
 import * as caseConverter from "../../../helpers/caseConverter";
 import axios from "axios";
-import {renderComponentsCheck} from "../../helpers/renderHelpers.js";
+import {renderElementsCheck} from "../../helpers/renderHelpers.js";
 
 global.fetch = jest.fn().mockResolvedValue({
     ok: true,
@@ -56,7 +56,7 @@ describe("First step of main form", () => {
         email: "test@example.com",
     };
 
-    let wrapper;
+    let wrapper, nextButton;
     beforeEach(() => {
         setActivePinia(createPinia());
         jest.clearAllMocks();
@@ -70,6 +70,8 @@ describe("First step of main form", () => {
             props: defaultProps,
             global: defaultGlobal,
         });
+
+        nextButton = wrapper.find('[data-testid="nextButton"]');
     });
 
     it("renders first step of form", async () => {
@@ -78,10 +80,9 @@ describe("First step of main form", () => {
             'reportSubjectInput', 'phoneInput', 'emailInput'
         ];
 
-        renderComponentsCheck(components, wrapper);
+        renderElementsCheck(components, wrapper);
 
-        const button = wrapper.find('[data-testid="nextButton"]');
-        expect(button.exists()).toBe(true);
+        expect(nextButton.exists()).toBe(true);
     });
 
     it("restores previously saved data from localStorage on mount", async () => {
@@ -203,7 +204,7 @@ describe("First step of main form", () => {
 
         localStorage.getItem("email");
 
-        wrapper.vm.action();
+        nextButton.trigger('click');
 
         expect(wrapper.vm.originalEmail).toBe(email);
         expect(wrapper.vm.Data.email).toBe("");
@@ -226,7 +227,7 @@ describe("First step of main form", () => {
         wrapper.vm.Data.email = email;
         localStorage.getItem("email");
 
-        wrapper.vm.action();
+        nextButton.trigger('click');
 
         expect(wrapper.vm.originalEmail).toBe(email);
         expect(wrapper.vm.Data.email).toBe(email);

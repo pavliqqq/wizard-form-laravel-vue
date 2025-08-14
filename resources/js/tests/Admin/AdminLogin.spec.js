@@ -2,7 +2,7 @@ import {flushPromises, mount} from "@vue/test-utils";
 import router from "../../router.js";
 import AdminLogin from "../../components/Admin/AdminLogin.vue";
 import { createPinia, setActivePinia } from "pinia";
-import { renderComponentsCheck } from "../helpers/renderHelpers.js"
+import { renderElementsCheck } from "../helpers/renderHelpers.js"
 import axios from "axios";
 
 const mockCheckUser = jest.fn();
@@ -51,7 +51,7 @@ describe("Admin login form", () => {
 
     it("renders login form", () => {
         const componentNames = ['emailInput', 'passwordInput', 'submitButton'];
-        renderComponentsCheck(componentNames, wrapper);
+        renderElementsCheck(componentNames, wrapper);
     });
 
     it("redirects to members page after successful login", async () => {

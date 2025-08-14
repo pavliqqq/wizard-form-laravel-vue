@@ -2,7 +2,7 @@ import { flushPromises, mount } from "@vue/test-utils";
 import AllMembers from "../../components/AllMembers/AllMembers.vue";
 import { createPinia, setActivePinia } from "pinia";
 import axios from "axios";
-import {renderComponentsCheck} from "../helpers/renderHelpers.js";
+import {renderElementsCheck} from "../helpers/renderHelpers.js";
 import {nextTick} from "vue";
 import {mockFormData} from "../helpers/mockHelpers.js";
 
@@ -60,7 +60,7 @@ describe("Members table", () => {
         await nextTick();
 
         const components = ['membersTable', 'memberRow'];
-        renderComponentsCheck(components, wrapper);
+        renderElementsCheck(components, wrapper);
     });
 
     it("excludes feature columns when user is not admin",() => {
@@ -89,7 +89,7 @@ describe("Members table", () => {
         await nextTick();
 
         const components = ['membersTable', 'memberRowEdit'];
-        renderComponentsCheck(components, wrapper);
+        renderElementsCheck(components, wrapper);
     });
 
     it("resets photo selection and preview", () => {

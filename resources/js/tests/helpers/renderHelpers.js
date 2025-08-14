@@ -1,4 +1,4 @@
-export function renderComponentsCheck(names, wrapper){
+export function renderElementsCheck(names, wrapper){
     names.forEach((name) => {
         const component = wrapper.find(`[data-testid="${name}"]`);
         expect(component.exists()).toBe(true)
