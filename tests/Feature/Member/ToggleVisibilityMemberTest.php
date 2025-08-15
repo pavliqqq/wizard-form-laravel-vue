@@ -15,18 +15,24 @@ beforeEach(function () {
 it('toggles member visibility as admin', function () {
     $member = Member::factory()->create();
 
-    $response = $this->actingAs($this->admin, 'sanctum')
-        ->postJson("/api/admin/members/toggle/{$member->id}");
-
-    $response->assertStatus(200)
+    $this->actingAs($this->admin)
+        ->postJson("/api/admin/members/toggle/{$member->id}")
+        ->assertStatus(200)
         ->assertJsonStructure(['success', 'visible']);
 
     $member->refresh();
     expect((bool)$member->visibility)->toBeFalse();
 });
 
+it('returns 401 when trying to toggle member visibility as non-admin', function() {
+    $member = Member::factory()->create();
+
+    $this->postJson("/api/admin/members/toggle/{$member->id}")
+        ->assertStatus(401);
+});
+
 it('returns 404 if member not found for toggle', function () {
-    $response = $this->actingAs($this->admin, 'sanctum')
+    $response = $this->actingAs($this->admin)
         ->postJson("/api/admin/members/toggle/100000");
 
     $response->assertStatus(404);
