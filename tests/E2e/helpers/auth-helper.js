@@ -9,6 +9,11 @@ export async function loginAsAdmin() {
     };
     await fillFormField(inputValues);
     const submitButton = await $('[data-testid="submitButton"]');
+
+    await submitButton.waitForDisplayed({
+        timeout: 10000,
+        timeoutMsg: 'Submit button not displayed at login form'
+    });
     await submitButton.click();
 
     await browser.waitUntil(
