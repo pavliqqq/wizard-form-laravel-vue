@@ -24,7 +24,7 @@ jest.mock("leaflet", () => {
     };
 });
 
-describe("Map.vue", () => {
+describe("Map", () => {
     it("renders map", () => {
         const wrapper = mount(Map);
 
