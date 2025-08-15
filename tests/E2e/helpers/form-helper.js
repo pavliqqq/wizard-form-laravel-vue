@@ -7,6 +7,11 @@ export async function loadFirstStepForm() {
     await browser.refresh();
 
     const nextButton = await $('[data-testid="nextButton"]');
+    await nextButton.waitForDisplayed({
+        timeout: 10000,
+        timeoutMsg: 'Next button not displayed at first step of form'
+    });
+
     await browser.waitUntil(
         async () => (await nextButton.isDisplayed()),
         {
@@ -39,10 +44,16 @@ export async function goToThirdStep(){
     await goToSecondStep();
 
     const backButton = await $('[data-testid="backButton"]')
-    await backButton.waitForDisplayed({ timeout: 5000 });
+    await backButton.waitForDisplayed({
+        timeout: 10000,
+        timeoutMsg: 'Back button not displayed at second step of form'
+    });
 
     const nextButton = await $('[data-testid="nextButton"]')
+    await nextButton.waitForDisplayed({
+        timeout: 10000,
+        timeoutMsg: 'Next button not displayed at second step of form'
+    });
 
-    await nextButton.waitForClickable({ timeout: 5000 });
     await nextButton.click();
 }

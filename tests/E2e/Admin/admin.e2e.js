@@ -2,7 +2,7 @@ import {expect, browser, $} from '@wdio/globals'
 import {fillFormField, inputFile, uniqueEmail} from "../utils/utils.js";
 import {loginAsAdmin} from "../helpers/auth-helper.js";
 
-describe('AdminFunctions', () => {
+describe('Admin functions', () => {
     const tableRowsSelector = 'table tbody tr';
 
     beforeAll(async () => {
@@ -19,10 +19,17 @@ describe('AdminFunctions', () => {
 
     it('deletes member', async () => {
         const rowsBefore = await $$(tableRowsSelector);
+        expect(rowsBefore.length).toBeGreaterThan(0);
+
         const countBefore = rowsBefore.length;
 
-        const firstDeleteButton = await rowsBefore[0].$('[data-testid="delete-button"]');
-        await firstDeleteButton.click();
+        const deleteButton = await rowsBefore[0].$('[data-testid="delete-button"]');
+        await deleteButton.waitForDisplayed({
+            timeout: 10000,
+            timeoutMsg: 'Delete button not displayed at members table'
+        });
+
+        await deleteButton.click();
 
         await browser.waitUntil(async () => {
             const rowsAfter = await $$(tableRowsSelector);
@@ -38,7 +45,13 @@ describe('AdminFunctions', () => {
 
     it('toggles vision', async () => {
         const toggleVisibilityButton = await $('[data-testid="toggleVisibility-button"]');
+        await toggleVisibilityButton.waitForDisplayed({
+            timeout: 10000,
+            timeoutMsg: 'Toggle button not displayed at members table'
+        });
+
         const buttonTextBefore = await toggleVisibilityButton.getText();
+
         await toggleVisibilityButton.click();
 
         await browser.waitUntil(async () => {
@@ -46,7 +59,7 @@ describe('AdminFunctions', () => {
             return currentText !== buttonTextBefore;
         }, {
             timeout: 10000,
-            timeoutMsg: 'Button text did not change after toggle'
+            timeoutMsg: 'Toggle button text did not change after toggle'
         });
 
         const buttonTextAfter = await toggleVisibilityButton.getText();
@@ -55,10 +68,18 @@ describe('AdminFunctions', () => {
 
     it('updates member', async () => {
         const editButton = await $('[data-testid="edit-button"]');
+        await editButton.waitForDisplayed({
+            timeout: 10000,
+            timeoutMsg: 'Edit button not displayed at members table'
+        });
+
         await editButton.click();
 
-        const updateButton = await $('[data-testid="updateButton"]')
-        await updateButton.waitForDisplayed({ timeout: 5000 });
+        const updateButton = await $('[data-testid="updateButton"]');
+        await updateButton.waitForDisplayed({
+            timeout: 10000,
+            timeoutMsg: 'Update button not displayed at members table'
+        });
 
         const inputValues = {
             full_name: 'Eddie New',
@@ -70,6 +91,11 @@ describe('AdminFunctions', () => {
         await inputFile('../data/chrome.png', 'photo');
 
         const photoImg = await $('[data-testid="photo-img"]');
+        await photoImg.waitForDisplayed({
+            timeout: 10000,
+            timeoutMsg: 'Photo image not displayed at members table'
+        });
+
         const srcBefore = await photoImg.getAttribute('src');
 
         await updateButton.click();

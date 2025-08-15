@@ -3,7 +3,6 @@ import {loginAsAdmin} from "../helpers/auth-helper.js";
 import {expectErrorVisible, fillFormField} from "../utils/utils.js";
 
 describe('Auth', () => {
-
     const inputValues = {
         email: 'admin@gmail.com',
         password: '12345'
@@ -11,12 +10,15 @@ describe('Auth', () => {
 
     let submitButton;
     beforeEach(async () => {
-
         await browser.url('/admin/login');
         await browser.deleteAllCookies();
         await browser.execute(() => sessionStorage.clear());
 
         submitButton = await $('[data-testid="submitButton"]');
+        await submitButton.waitForDisplayed({
+            timeout: 10000,
+            timeoutMsg: 'Submit button not displayed at login page'
+        });
     })
 
     it('logs in with valid credentials', async () => {
@@ -30,16 +32,17 @@ describe('Auth', () => {
 
         const logoutButton = await $('[data-testid="logoutButton"]')
 
-        await logoutButton.waitForClickable({ timeout: 10000 });
-
+        await logoutButton.waitForDisplayed({ timeout: 10000, timeoutMsg: 'Logout button not displayed after login' });
         await logoutButton.click();
 
-        await logoutButton.waitForDisplayed({ reverse: true, timeout: 10000 });
-        expect(await logoutButton.isDisplayed()).toBe(false);
+        await logoutButton.waitForDisplayed({
+            reverse: true,
+            timeout: 10000,
+            timeoutMsg: 'Logout button still visible after logout'
+        });
     })
 
     it('shows error message if credentials are invalid', async () => {
-
         const inputInvalidValues = {
             ...inputValues,
             password: '54321'
