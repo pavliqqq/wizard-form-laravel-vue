@@ -23,7 +23,7 @@ class StoreMemberRequest extends FormRequest
         return [
             'first_name' => 'required | string | min:2 | max:50',
             'last_name' => 'required | string | min:2 | max:50',
-            'birthdate' => ['required', 'date', new MinAge()],
+            'birthdate' => ['bail', 'required', 'date', new MinAge()],
             'report_subject' => 'required | min:2 | max:500',
             'country' => ['required', 'exists:countries,code'],
             'phone' => ['required', 'phone:'.$this->input('country')],
