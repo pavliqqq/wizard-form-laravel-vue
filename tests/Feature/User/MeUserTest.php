@@ -11,10 +11,9 @@ it('returns user data', function () {
     $this->seed(UserSeeder::class);
     $this->admin = User::where('role', 'admin')->first();
 
-    $response = $this->actingAs($this->admin, 'sanctum')
-        ->getJson("/api/me");
-
-    $response->assertStatus(200)
+    $this->actingAs($this->admin)
+        ->getJson("/api/me")
+        ->assertStatus(200)
         ->assertJsonStructure(['id', 'name', 'role'])
         ->assertJson([
             'id' => $this->admin->id,
@@ -24,9 +23,8 @@ it('returns user data', function () {
 });
 
 it('returns 401 if user unauthenticated', function () {
-    $response = $this->getJson('/api/me');
-
-    $response->assertStatus(401);
+    $this->getJson('/api/me')
+        ->assertStatus(401);
 });
 
 
