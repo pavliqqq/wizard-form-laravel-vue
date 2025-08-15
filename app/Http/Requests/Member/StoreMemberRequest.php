@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Member;
 
+use App\Rules\MinAge;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -22,7 +23,7 @@ class StoreMemberRequest extends FormRequest
         return [
             'first_name' => 'required | string | min:2 | max:50',
             'last_name' => 'required | string | min:2 | max:50',
-            'birthdate' => 'required | date | before: -16 years',
+            'birthdate' => ['required', 'date', new MinAge()],
             'report_subject' => 'required | min:2 | max:500',
             'country' => ['required', 'exists:countries,code'],
             'phone' => ['required', 'phone:'.$this->input('country')],
@@ -38,7 +39,6 @@ class StoreMemberRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'birthdate.before' => 'You must be at least 16 years old.',
             'phone.phone' => 'The phone number is not valid for the selected country.',
         ];
     }
