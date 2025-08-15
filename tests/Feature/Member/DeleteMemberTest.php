@@ -7,26 +7,36 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+it('deletes member as admin', function () {
     $this->seed(UserSeeder::class);
     $this->admin = User::where('role', 'admin')->first();
-});
 
-it('deletes member as admin', function () {
     $member = Member::factory()->create();
 
-    $response = $this->actingAs($this->admin, 'sanctum')
-        ->deleteJson("/api/admin/members/{$member->id}");
-
-    $response->assertStatus(200)
+    $this->actingAs($this->admin)
+        ->deleteJson("/api/admin/members/{$member->id}")
+        ->assertStatus(200)
         ->assertJson(['success' => true]);
+
+    $this->assertDatabaseMissing('members', [
+        'id' => $member->id
+    ]);
+});
+
+it('returns 401 when trying to delete member as non-admin', function() {
+    $member = Member::factory()->create();
+
+    $this->deleteJson("/api/admin/members/{$member->id}")
+        ->assertStatus(401);
 });
 
 it('returns 404 if member not found for delete', function () {
-    $response = $this->actingAs($this->admin, 'sanctum')
-        ->deleteJson("/api/admin/members/100000");
+    $this->seed(UserSeeder::class);
+    $this->admin = User::where('role', 'admin')->first();
 
-    $response->assertStatus(404);
+    $this->actingAs($this->admin)
+        ->deleteJson("/api/admin/members/100000")
+        ->assertStatus(404);
 });
 
 
