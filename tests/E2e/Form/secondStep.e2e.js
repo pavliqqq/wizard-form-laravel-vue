@@ -1,57 +1,85 @@
 import {expect, $} from '@wdio/globals'
-import {expectErrorVisible, fillFormField, inputFile} from '../utils/utils.js'
+import {emptyFieldsCheck, expectErrorVisible, fillFormField, inputFile} from '../utils/utils.js'
 import {goToSecondStep} from "../helpers/form-helper.js";
 
 
-describe('SecondStep', () => {
+describe('Second step of form', () => {
     let backButton;
     beforeEach(async () => {
         await goToSecondStep();
 
         backButton = await $('[data-testid="backButton"]')
-        await backButton.waitForDisplayed({ timeout: 10000 });
+        await backButton.waitForDisplayed({
+            timeout: 10000,
+            timeoutMsg: 'Back button not displayed at second step of form'
+        });
     })
 
     it('moves to next step when all fields are empty', async () => {
+        const inputFields = ['company', 'position', 'photo'];
+        const textAreaFields = ['about_me'];
+
+        await emptyFieldsCheck(inputFields, 'input');
+        await emptyFieldsCheck(textAreaFields, 'textArea');
+
         const nextButton = await $('[data-testid="nextButton"]');
+        await nextButton.waitForDisplayed({
+            timeout: 10000,
+            timeoutMsg: 'Next button not displayed at second step of form'
+        });
+
         await nextButton.click();
 
         const startOverButton = await $('[data-testid="startOver"]')
-        await startOverButton.waitForDisplayed({ timeout: 10000 });
-
-        expect(await startOverButton.isDisplayed()).toBe(true);
+        await startOverButton.waitForDisplayed({
+            timeout: 10000,
+            timeoutMsg: 'Start over button not displayed at third step of form'
+        });
     })
 
-   it('shows errors when submitting form with invalid data', async() => {
-       const inputInvalidValues = {
-           company: 'T',
-           position: 'P',
-       }
+    it('shows errors when submitting form with invalid data', async () => {
+        const inputInvalidValues = {
+            company: 'T',
+            position: 'P',
+        }
 
-       await fillFormField(inputInvalidValues);
+        await fillFormField(inputInvalidValues);
 
-       const aboutMe = await $('textarea[name="about_me"]');
-       await aboutMe.setValue('a');
+        const aboutMe = await $('textarea[name="about_me"]');
+        await aboutMe.waitForDisplayed({
+            timeout: 10000,
+            timeoutMsg: 'About me textarea not displayed at second step of form'
+        });
 
-       // file size is more than limit
-       await inputFile('../data/sun.png', 'photo');
+        await aboutMe.setValue('a');
 
-       const nextButton = await $('[data-testid="nextButton"]');
-       await nextButton.click();
+        // file size is more than limit
+        await inputFile('../data/sun.png', 'photo');
 
-       for (const name in inputInvalidValues) {
-           await expectErrorVisible(name);
-       }
+        const nextButton = await $('[data-testid="nextButton"]');
+        await nextButton.waitForDisplayed({
+            timeout: 10000,
+            timeoutMsg: 'Next button not displayed at second step of form'
+        });
 
-       await expectErrorVisible('about_me');
-       await expectErrorVisible('photo');
-   })
+        await nextButton.click();
 
-    it('returns back to previous step', async() => {
+        for (const name in inputInvalidValues) {
+            await expectErrorVisible(name);
+        }
+
+        await expectErrorVisible('about_me');
+        await expectErrorVisible('photo');
+        expect(await nextButton.isDisplayed()).toBe(true);
+    })
+
+    it('returns back to previous step', async () => {
         await backButton.click();
 
-        await backButton.waitForDisplayed({ reverse: true, timeout: 10000 });
-
-        expect(await backButton.isDisplayed()).toBe(false);
+        await backButton.waitForDisplayed({
+            reverse: true,
+            timeout: 10000,
+            timeoutMsg: 'Back button still visible after click'
+        });
     })
 })
