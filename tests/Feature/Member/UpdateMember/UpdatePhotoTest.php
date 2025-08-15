@@ -5,7 +5,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
-require __DIR__ . '/Helpers/UpdateHelpers.php';
+require_once __DIR__ . '/Helpers/UpdateHelpers.php';
 
 uses(RefreshDatabase::class);
 
