@@ -1,8 +1,8 @@
-import {expect, browser, $} from '@wdio/globals'
+import {browser, $} from '@wdio/globals'
 import {expectErrorVisible, fillFormField, uniqueEmail} from '../utils/utils.js'
 import {loadFirstStepForm} from "../helpers/form-helper.js";
 
-describe('FirstStep', () => {
+describe('First step of form', () => {
     let inputValues = {
         first_name: 'Peter',
         last_name: 'Parker',
@@ -26,9 +26,10 @@ describe('FirstStep', () => {
         await nextButton.click();
 
         const backButton = await $('[data-testid="backButton"]');
-        await backButton.waitForDisplayed({ timeout: 10000 });
-
-        expect(await backButton.isDisplayed()).toBe(true);
+        await backButton.waitForDisplayed({
+            timeout: 10000,
+            timeoutMsg: 'Back button not displayed at second step of form'
+        });
     })
 
     it('shows errors when required fields are empty', async () => {
@@ -42,12 +43,16 @@ describe('FirstStep', () => {
     it('shows error when submitting duplicate email', async() => {
         await fillFormField(inputValues);
 
-        const newEmail = await $('input[name="email"]').getValue();
+        const newEmail = await $('input[name="email"]');
+        await newEmail.waitForDisplayed({ timeout: 10000, timeoutMsg: `Email input not displayed` });
+
+        const newEmailValue = await newEmail.getValue();
+
         await nextButton.click();
 
         await browser.waitUntil(async () => {
             const email = await browser.execute(() => localStorage.getItem("email"));
-            return email === newEmail;
+            return email === newEmailValue;
         }, {
             timeout: 10000,
             timeoutMsg: 'LocalStorage has no email field',
@@ -56,7 +61,7 @@ describe('FirstStep', () => {
         await browser.execute(() => localStorage.clear());
         await browser.url('/form');
 
-        const newInputValues = { ...inputValues, email: newEmail }
+        const newInputValues = { ...inputValues, email: newEmailValue }
         await fillFormField(newInputValues);
 
         await nextButton.click();
