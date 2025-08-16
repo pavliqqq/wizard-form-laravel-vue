@@ -33,7 +33,7 @@ export async function inputFile(relativePath, fileInputName){
     const remoteFilePath = await browser.uploadFile(fullFilePath);
 
     const fileInput = await $(`input[name="${fileInputName}"]`);
-    await fileInput.waitForDisplayed({ timeout: 10000, timeoutMsg: `File input "${fileInputName}" not displayed` });
+    await fileInput.waitForExist({ timeout: 10000, timeoutMsg: `File input "${fileInputName}"does not exists` });
 
     await fileInput.setValue(remoteFilePath);
 }
