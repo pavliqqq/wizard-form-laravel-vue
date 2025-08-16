@@ -1,7 +1,7 @@
 import {mount} from "@vue/test-utils";
 import BaseTextArea from "../../../components/UI/Form/BaseTextArea.vue";
 
-describe("BaseTextArea.vue", () => {
+describe("BaseTextArea components", () => {
     const defaultProps = {
         name: "about_me",
         placeholder: "About Me",
@@ -24,7 +24,7 @@ describe("BaseTextArea.vue", () => {
         expect(textArea.element.value).toBe(defaultProps.modelValue);
     });
 
-    it("emits update:modelValue on textArea", async () => {
+    it("updates field when user types", async () => {
         const textArea = wrapper.find("textarea");
 
         expect(textArea.element.value).toBe(defaultProps.modelValue);
@@ -36,7 +36,7 @@ describe("BaseTextArea.vue", () => {
         expect(wrapper.emitted("update:modelValue")[0]).toEqual([ newText ]);
     });
 
-    it("displays error message when errors prop is provided", () => {
+    it("displays error message when errors exists for field", () => {
         const error = "The about me field is required."
         const wrapper = mount(BaseTextArea, {
             props: {

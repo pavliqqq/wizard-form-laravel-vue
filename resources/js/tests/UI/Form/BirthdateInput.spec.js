@@ -2,7 +2,7 @@ import { mount } from "@vue/test-utils";
 import BirthdateInput from "../../../components/UI/Form/BirthdateInput.vue";
 import BaseInput from "../../../components/UI/Form/BaseInput.vue";
 
-describe("BirthdateInput.vue", () => {
+describe("BirthdateInput component", () => {
     const mockToday = new Date("2025-07-29");
     const mockTodayString = mockToday.toISOString().split("T")[0];
     const expectedMaxDate = new Date("2009-07-29").toISOString().split("T")[0];
@@ -41,7 +41,7 @@ describe("BirthdateInput.vue", () => {
         expect(baseInput.props("modelValue")).toBe(mockTodayString);
     });
 
-    it("emits update:modelValue on date change", async () => {
+    it("updates field when user selects date", async () => {
         const baseInput = wrapper.findComponent(BaseInput);
         expect(baseInput.exists()).toBe(true);
 
@@ -52,7 +52,7 @@ describe("BirthdateInput.vue", () => {
         expect(wrapper.emitted("update:modelValue")[0]).toEqual([newData]);
     });
 
-    it("displays error message when errors prop is provided", () => {
+    it("displays error message when errors exists for field", () => {
         const error = "The birthdate field is required.";
         const errors = { birthdate: error };
 

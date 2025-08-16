@@ -1,7 +1,7 @@
 import { mount } from "@vue/test-utils";
 import BaseTable from "../../../components/UI/Form/BaseTable.vue";
 
-describe("BaseTable.vue", () => {
+describe("BaseTable component", () => {
     const defaultProps = {
         headers: ["Full Name", "Email"],
     };

@@ -3,7 +3,7 @@ import CountryPhoneInput from "../../../components/UI/Form/CountryPhoneInput.vue
 import { VueTelInput } from "vue-tel-input";
 import {nextTick} from "vue";
 
-describe("CountryPhoneInput.vue", () => {
+describe("CountryPhoneInput component", () => {
     const defaultProps = {
         name: "phone",
         phone: "+3809911222345",
@@ -34,7 +34,7 @@ describe("CountryPhoneInput.vue", () => {
         );
     });
 
-    it("emits update:phone on input change", async () => {
+    it("updates field when user types", async () => {
         const vueTelInput = wrapper.findComponent(VueTelInput);
         expect(vueTelInput.exists()).toBe(true);
 
@@ -52,7 +52,7 @@ describe("CountryPhoneInput.vue", () => {
         expect(lastEmittedPhone).toEqual(newPhone);
     });
 
-    it("emits update:country on select country change", async () => {
+    it("updates field when user selects country", async () => {
         const vueTelInput = wrapper.findComponent(VueTelInput);
         expect(vueTelInput.exists()).toBe(true);
 
@@ -65,7 +65,7 @@ describe("CountryPhoneInput.vue", () => {
         expect(wrapper.emitted("update:country")[0]).toEqual([newCountry]);
     });
 
-    it("displays error message when errors prop is provided", () => {
+    it("displays error message when errors exists for field", () => {
         const error = "The phone field is required."
         const wrapper = mount(CountryPhoneInput, {
             props: {

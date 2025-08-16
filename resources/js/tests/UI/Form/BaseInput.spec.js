@@ -1,7 +1,7 @@
 import {mount} from "@vue/test-utils";
 import BaseInput from "../../../components/UI/Form/BaseInput.vue";
 
-describe("BaseInput.vue", () => {
+describe("BaseInput component", () => {
     const defaultProps = {
         name: "email",
         type: "email",
@@ -25,7 +25,7 @@ describe("BaseInput.vue", () => {
         expect(input.element.value).toBe(defaultProps.modelValue);
     });
 
-    it("emits update:modelValue on input", async () => {
+    it("updates field when user types", async () => {
         const input = wrapper.find("input");
 
         expect(input.element.value).toBe(defaultProps.modelValue);
@@ -37,7 +37,7 @@ describe("BaseInput.vue", () => {
         expect(wrapper.emitted("update:modelValue")[0]).toEqual([ newEmail ]);
     });
 
-    it("displays error message when errors prop is provided", () => {
+    it("displays error message when errors exists for field", () => {
         const error = "The email field is required."
         const wrapper = mount(BaseInput, {
             props: {

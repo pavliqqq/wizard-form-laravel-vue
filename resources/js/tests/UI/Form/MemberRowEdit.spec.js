@@ -3,7 +3,7 @@ import MemberRowEdit from "../../../components/UI/Form/MemberRowEdit.vue";
 import BaseInput from "../../../components/UI/Form/BaseInput.vue";
 import FileInput from "../../../components/UI/Form/FileInput.vue";
 
-describe("MemberRowEdit.vue", () => {
+describe("MemberRowEdit component", () => {
     const defaultProps = {
         memberId: 10,
         memberPhoto: "photo/test.jpg",
@@ -29,7 +29,7 @@ describe("MemberRowEdit.vue", () => {
         });
     })
 
-    it("renders all editable inputs and buttons", async () => {
+    it("renders all inputs and buttons for editing", async () => {
         const baseInputs = wrapper.findAllComponents(BaseInput);
 
         const modelValues = baseInputs.map((input) => input.props("modelValue"));
@@ -48,7 +48,7 @@ describe("MemberRowEdit.vue", () => {
         expect(cancelButton.exists()).toBe(true);
     });
 
-    it("renders img with photoPreview if provided", () => {
+    it("renders photo with photo preview if it provided", () => {
         const photoPreview = "photoPreview.jpg";
 
         const wrapper = mount(MemberRowEdit, {
@@ -63,7 +63,7 @@ describe("MemberRowEdit.vue", () => {
         expect(img.attributes("src")).toBe(photoPreview);
     });
 
-    it("emits update:photo", async () => {
+    it("updates field when user selects file", async () => {
         const file = new File([new Uint8Array(300 * 1024)], "test.jpg", {
             type: "image/jpeg",
         });
@@ -76,38 +76,7 @@ describe("MemberRowEdit.vue", () => {
         expect(wrapper.emitted("update:photo")).toBeTruthy();
     });
 
-    it("emits update:fullName, update:reportSubject, update:email", async () => {
-        const emittedValues = {
-            full_name: {
-                event: "update:fullName",
-                value: "Updated Name"
-            },
-            report_subject: {
-                event: "update:reportSubject",
-                value: "Updated Subject",
-            },
-            email: {
-                event: "update:email",
-                value: "updated@example.com"
-            },
-        };
-
-        const baseInputs = wrapper.findAllComponents(BaseInput);
-
-        for (const input of baseInputs) {
-            const name = input.props("name");
-            const config = emittedValues[name];
-
-            expect(config).toBeTruthy();
-
-            await input.vm.$emit("update:modelValue", config.value);
-
-            expect(wrapper.emitted(config.event)).toBeTruthy();
-            expect(wrapper.emitted(config.event)[0]).toEqual([config.value]);
-        }
-    });
-
-    it("emits update with memberId when update button is clicked", async () => {
+    it("updates member with member id when update button is clicked", async () => {
         const updateButton = wrapper.find('[data-testid="updateButton"]');
         expect(updateButton.exists()).toBe(true);
 

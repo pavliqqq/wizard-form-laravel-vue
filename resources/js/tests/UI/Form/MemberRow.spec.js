@@ -1,7 +1,7 @@
 import { mount } from "@vue/test-utils";
 import MemberRow from "../../../components/UI/Form/MemberRow.vue";
 
-describe("MemberRow.vue", () => {
+describe("MemberRow component", () => {
     const defaultProps = {
         member: {
             id: 1,
@@ -43,7 +43,7 @@ describe("MemberRow.vue", () => {
         );
     });
 
-    it("renders admin buttons when isAdmin is true", () => {
+    it("renders admin buttons when user is admin", () => {
         const wrapper = mount(MemberRow, {
             props: {
                 ...defaultProps,
@@ -56,7 +56,7 @@ describe("MemberRow.vue", () => {
         expect(wrapper.find('[data-testid="toggleVisibility-button"]').exists()).toBe(true);
     });
 
-    it("emits edit, delete, toggle", async () => {
+    it("emits events when admin clicks edit, delete or toggle buttons", async () => {
         const wrapper = mount(MemberRow, {
             props: {
                 ...defaultProps,

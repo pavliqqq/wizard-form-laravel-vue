@@ -13,7 +13,7 @@ jest.mock("../../../stores/errorStore.js", () => ({
     }),
 }));
 
-describe("FileInput.vue", () => {
+describe("FileInput component", () => {
     beforeEach(() => {
         setActivePinia(createPinia());
 
@@ -37,7 +37,7 @@ describe("FileInput.vue", () => {
         expect(input.attributes("name")).toBe(defaultProps.name);
     });
 
-    it("emits update:modelValue on input", async () => {
+    it("updates field when user selects file", async () => {
         const wrapper = mount(FileInput, {
             props: defaultProps,
         });
