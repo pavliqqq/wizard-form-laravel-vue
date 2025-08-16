@@ -24,6 +24,7 @@
                 :modelValue="fullName"
                 @update:modelValue="emit('update:fullName', $event)"
                 :errors="errors"
+                data-testid="fullNameInput"
             />
         </td>
         <td class="p-3 break-words max-w-[180px]">
@@ -32,6 +33,7 @@
                 :modelValue="reportSubject"
                 @update:modelValue="emit('update:reportSubject', $event)"
                 :errors="errors"
+                data-testid="reportSubjectInput"
             />
         </td>
         <td class="p-3 break-words max-w-[200px]">
@@ -40,6 +42,7 @@
                 :modelValue="email"
                 @update:modelValue="emit('update:email', $event)"
                 :errors="errors"
+                data-testid="emailInput"
             />
         </td>
         <td class="p-3 whitespace-nowrap">
